@@ -1,0 +1,40 @@
+**SELECTCDADES: GLOBAL
+	E:\AdConta\AdConta\AdConta\Models\SideModel.cs(18):		ADCONTA
+	E:\AdConta\AdConta\Models\DatabaseConnection.cs(219):	MODELS
+
+**SELECTPROPS: MODELS
+	E:\AdConta\AdConta\Models\DatabaseConnection.cs(222):	MODELS
+
+**SELECTDIARIO: MODCONTA
+	E:\AdConta\AdConta\ModuloContabilidadç\Models\Asientos\AsientoSimpleModel.cs(36):	MODCONTA
+
+**SELECTMAYOR: MODCONTA
+	E:\AdConta\AdConta\ModuloContabilidadç\Models\TabMayorModel.cs(24):		MODCONTA
+
+**CUENTADEFAULT: MODCONTA
+	E:\AdConta\AdConta\ModuloContabilidadç\Models\TabMayorModel.cs(17):		MODCONTA
+
+**WHERECDADES_NOBAJA: ADCONTA
+	E:\AdConta\AdConta\AdConta\Models\SideModel.cs(19):		ADCONTA
+
+**DIGITOSCUENTAS: GLOBAL
+	E:\AdConta\AdConta\AdConta\VMMain.cs(80):				ADCONTA
+	E:\AdConta\AdConta\Models\LedgeAccount.cs(40):			MODELS
+
+**MINCODCUENTAS: GLOBAL
+	E:\AdConta\AdConta\AdConta\VMMain.cs(85):				ADCONTA
+	E:\AdConta\AdConta\Models\LedgeAccount.cs(34):			MODELS
+
+**MAXCODCUENTAS: GLOBAL
+	E:\AdConta\AdConta\AdConta\VMMain.cs(85):				ADCONTA
+	E:\AdConta\AdConta\Models\LedgeAccount.cs(34):			MODELS
+
+**conta1ConnectionString: MODELS
+	E:\AdConta\AdConta\Models\DatabaseConnection.cs(179):	MODELS
+
+**ASIENTOSIMPLE_WINDOWED: MODCONTA
+	E:\AdConta\AdConta\ModuloContabilidadç\ViewModel\VMAsientoSimple.cs(22):	MODCONTA
+	E:\AdConta\AdConta\ModuloContabilidadç\ViewModel\VMTabMayor.cs(282):		MODCONTA
+
+**USERFONTSIZE: GLOBAL
+	E:\AdConta\AdConta\TBoxLabel\TBoxLabel.xaml.cs(68):		TBOXLABEL

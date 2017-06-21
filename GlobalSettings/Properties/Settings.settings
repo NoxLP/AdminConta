@@ -1,0 +1,61 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GlobalSettings.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SELECTCDADES" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM Cdades</Value>
+    </Setting>
+    <Setting Name="DIGITOSCUENTAS" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">7</Value>
+    </Setting>
+    <Setting Name="MINCODCUENTAS" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MAXCODCUENTAS" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="USERFONTSIZE" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">13</Value>
+    </Setting>
+    <Setting Name="SELECTDIARIO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM</Value>
+    </Setting>
+    <Setting Name="ORDERDIARIO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY NApunte</Value>
+    </Setting>
+    <Setting Name="SELECTMAYOR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM</Value>
+    </Setting>
+    <Setting Name="ORDERMAYOR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY NAsiento, Fecha, FechaValor</Value>
+    </Setting>
+    <Setting Name="CUENTADEFAULT" Type="System.String" Scope="User">
+      <Value Profile="(Default)">5720001</Value>
+    </Setting>
+    <Setting Name="ASIENTOSIMPLE_WINDOWED" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="WHERECDADES_NOBAJA" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">WHERE Baja=0</Value>
+    </Setting>
+    <Setting Name="SELECTPROPS" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM Props</Value>
+    </Setting>
+    <Setting Name="ORDERPROPS" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY Dni</Value>
+    </Setting>
+    <Setting Name="conta1ConnectionString" Type="(Connection string)" Scope="Application">
+      <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;ConnectionString&gt;Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=e:\AdConta\AdConta\AdConta\conta1.mdf;Integrated Security=True&lt;/ConnectionString&gt;
+&lt;/SerializableConnectionString&gt;</DesignTimeValue>
+      <Value Profile="(Default)">Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=e:\AdConta\AdConta\AdConta\conta1.mdf;Integrated Security=True</Value>
+    </Setting>
+    <Setting Name="ORDERCDADES" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY Codigo</Value>
+    </Setting>
+    <Setting Name="NOMBRECUENTADEFAULT" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Banco</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

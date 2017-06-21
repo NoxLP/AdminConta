@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="ModuloContabilidad.TabMayorUC"
+             x:Name="RootTabMayor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ribbon="http://schemas.microsoft.com/winfx/2006/xaml/presentation/ribbon"
+             xmlns:TabbedExpander="clr-namespace:TabbedExpanderCustomControl;assembly=TabbedExpanderCustomControl"
+             xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
+             xmlns:local="clr-namespace:ModuloContabilidad"
+             xmlns:converters="clr-namespace:Converters;assembly=Converters"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             MinWidth="500"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="650"
+             Loaded="RootTabMayor_Loaded">
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
+
+    <Grid x:Name="MayorRootGrid">
+        <DockPanel LastChildFill="True">
+            <!--Formato euros: StringFormat={}{0:C}-->
+            <DataGrid x:Name="TabDGridStatus" HeadersVisibility="None" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" 
+                          IsReadOnly="True" Margin="0,0,0,2" RowHeaderWidth="0" AutoGenerateColumns="False"
+                          SelectionMode="Single" SelectionUnit="Cell" CanUserAddRows="False" ItemsSource="{Binding StatusGridSource, Mode=OneWay}"
+                          HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray" GridLinesVisibility="Vertical"
+                          Background="{StaticResource MayorDGridBackground}"
+                          Height="{Binding ElementName=TabDGridStatus, Path=RowHeight, Mode=OneWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="N.As." Binding="{Binding NAsiento}" Width="45" MinWidth="30"
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=\{0:dd/MM/yyyy\}}" Width="75" MinWidth="75" 
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridCenterCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="6*" MinWidth="100"    
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridCenterCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Debe" Binding="{Binding Debe, StringFormat={}{0:C}}" Width="1*" MinWidth="55" MaxWidth="75"  
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Haber" Binding="{Binding Haber, StringFormat={}{0:C}}" Width="1*" MinWidth="55" MaxWidth="75"   
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Saldo" Binding="{Binding Saldo, StringFormat={}{0:C}}" Width="1*" MinWidth="55" MaxWidth="75"    
+                                            CellStyle="{StaticResource CellBackgroundGray}"
+                                            ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridHyperlinkColumn Header="Recibo" Width="0.3*" CellStyle="{StaticResource CellBackgroundGray}"
+                                                 ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridHyperlinkColumn Header="Factura" Width="0.3*" CellStyle="{StaticResource CellBackgroundGray}"
+                                                 ElementStyle="{StaticResource StatusDGridRightCellStyle}" d:IsHidden="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--<TextBox Text="Sumas y Saldos" DockPanel.Dock="Bottom" BorderBrush="Blue" BorderThickness="0.5" Background="LightGray" FontSize="11"
+                         HorizontalAlignment="Stretch" TextAlignment="Center"/>-->
+            <DataGrid x:Name="TabDGridPrincipal" DockPanel.Dock="Bottom" RowHeaderWidth="0" 
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"
+                          IsReadOnly="True" Margin="0,2,0,0" ItemsSource="{Binding DView, Mode=OneWay}" AutoGenerateColumns="False" 
+                          SelectionMode="Single" SelectionUnit="Cell" CanUserAddRows="False"
+                          HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray"
+                          Background="{StaticResource MayorDGridBackground}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="N.As." Binding="{Binding NAsiento}" Width="45" MinWidth="30"  
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=\{0:dd/MM/yyyy\}}" Width="75" MinWidth="75" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridCenterCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="6*" MinWidth="100" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridLeftCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Debe" Binding="{Binding Debe, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Haber" Binding="{Binding Haber, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridTextColumn Header="Saldo" Binding="{Binding Saldo, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridHyperlinkColumn Header="Recibo" Binding="{Binding Recibo}" Width="0.3*" 
+                                                 HeaderStyle="{StaticResource DGridLeftHeaderStyle}"
+                                                 ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                    <DataGridHyperlinkColumn Header="Factura" Binding="{Binding Factura}" Width="0.3*" 
+                                                 HeaderStyle="{StaticResource DGridLeftHeaderStyle}"
+                                                 ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--Height="{Binding DataGridHeight}"-->
+        </DockPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ModuloContabilidad.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SELECTDIARIO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM</Value>
+    </Setting>
+    <Setting Name="ORDERDIARIO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY NApunte</Value>
+    </Setting>
+    <Setting Name="SELECTMAYOR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT * FROM</Value>
+    </Setting>
+    <Setting Name="ORDERMAYOR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY NAsiento, Fecha, FechaValor</Value>
+    </Setting>
+    <Setting Name="CUENTADEFAULT" Type="System.String" Scope="User">
+      <Value Profile="(Default)">5720001</Value>
+    </Setting>
+    <Setting Name="ASIENTOSIMPLE_WINDOWED" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

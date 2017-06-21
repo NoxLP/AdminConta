@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="AdConta.UserControls.TBoxLabel"
+             x:Name="TBL"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="150">
+    <Grid>
+        <StackPanel>
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Label}">
+                    <Setter Property="DockPanel.Dock" Value="Top"/>
+                </Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="DockPanel.Dock" Value="Left"/>
+                </Style>
+            </StackPanel.Resources>
+            <DockPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label x:Name="BaseLabel" Grid.Row="0" Content="{Binding ElementName=TBL, Path=Label}" 
+                           Height="Auto" Width="Auto"
+                           Margin="2,0,0,1" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <TextBox x:Name="BaseTBox" Grid.Row="1" Text="{Binding ElementName=TBL, Path=Text, UpdateSourceTrigger=PropertyChanged}"
+                             Height="{Binding ElementName=TBL, Path=TBHeight}" Width="{Binding ElementName=TBL, Path=TBWidth}" 
+                             Margin="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                             FontSize="{Binding ElementName=TBL, Path=TBFontSize}" FontStyle="{Binding ElementName=TBL, Path=TBFontStyle}"
+                             FontWeight="{Binding ElementName=TBL, Path=TBFontWeight}"
+                             TextWrapping="{Binding ElementName=TBL, Path=TextWrap}" AcceptsReturn="{Binding ElementName=TBL, Path=AcceptsRet}"
+                             IsReadOnly="{Binding ElementName=TBL, Path=TBReadOnly}" TextAlignment="{Binding ElementName=TBL, Path=TBTextAlignment}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding ElementName=TBL, Path=EnterKeyBinding}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                </Grid>
+            </DockPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,124 @@
+﻿<UserControl x:Class="ModuloContabilidad.AsientoSimple"
+             x:Name="RootAsiento"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ModuloContabilidad"
+             xmlns:converters="clr-namespace:Converters;assembly=Converters"
+             xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
+             xmlns:TabbedExpander="clr-namespace:TabbedExpanderCustomControl;assembly=TabbedExpanderCustomControl"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500">
+    <UserControl.Resources>
+        <converters:StringFormatConverter x:Key="stringConverter"/>
+        <converters:AsientoDGridHeightConverter x:Key="ADGridHeightconverter"/>
+        <Image x:Key="PinImage" Source="{StaticResource PinPng}" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="0.6" ScaleY="0.6"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="1" X="-0.8"/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <ResourceDictionary x:Key="PinButtonDict">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/PinButton.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" Margin="3,4,3,3"
+                    BorderThickness="1" BorderBrush="Gray">
+                <DockPanel>
+                    <UserControls:TBoxLabel Label="Fecha" DockPanel.Dock="Left" TBReadOnly="False" HorizontalAlignment="Left" TBWidth="75"
+                                            Margin="4,3,3,3" Text="{Binding Fecha, Converter={StaticResource stringConverter}, ConverterParameter=DATEd}"/>
+                    <UserControls:TBoxLabel Label="Asiento" DockPanel.Dock="Left" TBReadOnly="True" HorizontalAlignment="Left" TBWidth="50"
+                                            Margin="3" TBTextAlignment="Right" Text="{Binding Asiento}"/>
+                    <UserControls:TBoxLabel Label="Cuenta base" DockPanel.Dock="Left" TBReadOnly="True" HorizontalAlignment="Left" TBWidth="80"
+                                            Margin="3" TBTextAlignment="Right" Text="{Binding CuentaBase}"/>
+                    <UserControls:TBoxLabel Label="Descuadre" DockPanel.Dock="Right" TBReadOnly="True" HorizontalAlignment="Right" TBWidth="80"
+                                            Margin="3,3,4,3" TBTextAlignment="Right" Text="{Binding Descuadre}"/>
+                    <UserControls:TBoxLabel Label="Saldo Haber" DockPanel.Dock="Right" TBReadOnly="True" HorizontalAlignment="Right" TBWidth="80"
+                                            Margin="3" TBTextAlignment="Right" Text="{Binding SaldoHaber}"/>
+                    <UserControls:TBoxLabel Label="Saldo Debe" DockPanel.Dock="Right" TBReadOnly="True" HorizontalAlignment="Right" TBWidth="80"
+                                            Margin="3" TBTextAlignment="Right" Text="{Binding SaldoDebe}"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+        <Grid Grid.Row="1" x:Name="ASGridRow1">
+            <DataGrid x:Name="DGridAsiento" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Margin="3,1,3,1"
+                          HeadersVisibility="All" AutoGenerateColumns="False"
+                          SelectionMode="Extended" SelectionUnit="CellOrRowHeader" CanUserAddRows="True"
+                          HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray"
+                          ItemsSource="{Binding VMApuntes}"
+                          Background="{StaticResource MayorDGridBackground}">
+                <DataGrid.Style>
+                    <Style TargetType="{x:Type DataGrid}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsWindowed}" Value="True">
+                                <Setter Property="Height" Value="{Binding ElementName=RootAsiento, Path=ActualHeight,
+                                    Converter={StaticResource ADGridHeightconverter}, 
+                                    ConverterParameter=WINDOWED}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsWindowed}" Value="False">
+                                <Setter Property="Height" 
+                                        Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabbedExpander:TabbedExpander}}, 
+                        Path=ActualHeight, Mode=OneWay, Converter={StaticResource ADGridHeightconverter}, ConverterParameter=AS,
+                        diag:PresentationTraceSources.TraceLevel=High}"/>
+                                <!--Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type AbleTabControl:TabMayorUC}}, 
+                                    Path=DataContext.SecondaryDGridHeight, 
+                                    Converter={StaticResource ADGridHeightconverter}, 
+                                    ConverterParameter=AS,
+                                    diag:PresentationTraceSources.TraceLevel=High}"/>-->
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Cuenta Debe" Binding="{Binding CuentaDebe}" Width="1*" MinWidth="85" MaxWidth="85"
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridCenterCellStyle}"/>
+                    <DataGridTextColumn Header="Importe Debe" Binding="{Binding ImporteDebe, StringFormat=N2}" Width="1*" MinWidth="85" MaxWidth="85"
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}"/>
+                    <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="6*" MinWidth="100" 
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridLeftCellStyle}"/>
+                    <DataGridTextColumn Header="Importe Haber" Binding="{Binding ImporteHaber, StringFormat=N2}" Width="1*" MinWidth="85" MaxWidth="85"
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridRightCellStyle}"/>
+                    <DataGridTextColumn Header="Cuenta Haber" Binding="{Binding CuentaHaber}" Width="1*" MinWidth="85" MaxWidth="85"
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            ElementStyle="{StaticResource DGridCenterCellStyle}"/>
+                    <DataGridHyperlinkColumn Header="Recibo" Binding="{Binding Recibo}" Width="0.3*" 
+                                                 HeaderStyle="{StaticResource DGridLeftHeaderStyle}"
+                                                 ElementStyle="{StaticResource DGridRightCellStyle}"/>
+                    <DataGridHyperlinkColumn Header="Factura" Binding="{Binding Factura}" Width="0.3*" 
+                                                 HeaderStyle="{StaticResource DGridLeftHeaderStyle}"
+                                                 ElementStyle="{StaticResource DGridRightCellStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <DockPanel VerticalAlignment="Stretch" Height="Auto">
+                <Button x:Name="PinButton" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="19"
+                        Template="{StaticResource PinButtonTemplate}" Content="{StaticResource PinImage}" Visibility="{Binding PinButtonVisibility}"
+                        Command="{Binding MoveAsientoToWindow}"/>
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Guardar" Margin="0,3,2,2"/>
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Cancelar" Margin="0,3,2,2"
+                        Click="TabExpCloseTabButton_Click"/>
+                <Button DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="A.Predef" Margin="2,3,0,2"/>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</UserControl>

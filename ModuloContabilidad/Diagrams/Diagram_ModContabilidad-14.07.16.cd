@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Class Name="ModuloContabilidad.AsientosWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>AsientosWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabDiarioModel">
+    <Position X="6.25" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\TabDiarioModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpanderFiller_Diario">
+    <Position X="15" Y="8" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAACAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabbedExpanderFiller_Diario.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpanderFiller_Mayor">
+    <Position X="17.75" Y="8" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAACAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabbedExpanderFiller_Mayor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.AsientoSimple" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabExpTabAsientoSimpleUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.VMTabbedExpDiario" BaseTypeListCollapsed="true">
+    <Position X="19" Y="11.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BBAAAAAAAAAAEAIAAAAAAAAAAEAAAAAAAAAAAACAACA=</HashCode>
+      <FileName>TabbedExpanderTabs\VMTabbedExpDiario.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabDiarioUC" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabDiarioUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabMayorUC" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAQAAEAAAAAAAgAAAAAAAEAAAAA=</HashCode>
+      <FileName>TabMayorUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpTemplateSelector_ModContabilidad" Collapsed="true">
+    <Position X="20.75" Y="0.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TemplateSelectors.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.VMAsientoSimple">
+    <Position X="16.75" Y="11.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAgAAAAEgAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\VMAsientoSimple.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Command_MoveAsientoToWindow" BaseTypeListCollapsed="true">
+    <Position X="17.5" Y="4.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\VMAsientoSimple.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.VMTabDiario">
+    <Position X="13.75" Y="11.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AgQAAAAAAAAAAAAAAAIAAAAAAAEAAAAAAAAAAAACQBA=</HashCode>
+      <FileName>ViewModel\VMTabDiario.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.VMTabMayor">
+    <Position X="21.25" Y="11.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAQgBBAAAAAQAEjADhMAgEGAQAEAAkAACgCAAABCQBA=</HashCode>
+      <FileName>ViewModel\VMTabMayor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Command_NewAsientoSimple" BaseTypeListCollapsed="true">
+    <Position X="20.5" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\VMTabMayor.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.Command_Punteo" BaseTypeListCollapsed="true">
+    <Position X="15.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\VMTabMayor.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.Models.aMayor_DBConnectionBase">
+    <Position X="0.5" Y="9.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\aMayor_DBConnectionBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Models.AsientosDBConnection">
+    <Position X="3.5" Y="9.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAFAAAAAAAAAAAAAACAABAAAEAAAAAAA=</HashCode>
+      <FileName>Models\Asientos\AsientosDBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Models.AsientoSimpleModel">
+    <Position X="3.5" Y="12.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAEAAIAAAAIAAAAAAAAEAABAAAABAAAAAA=</HashCode>
+      <FileName>Models\Asientos\AsientoSimpleModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Models.TabMayorDBConnection">
+    <Position X="0.5" Y="11.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAFAABAAAAAAAAAAAAAABAAAEAAAAAAA=</HashCode>
+      <FileName>Models\TabMayorDBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Models.TabMayorModel">
+    <Position X="0.5" Y="14.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAABAAAAAEEAAAAABAAARAAgJAAAAAgEAA=</HashCode>
+      <FileName>Models\TabMayorModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.Apunte">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQACAgAAAAAAIAACAAAAAAQAAAAgAAAAAgEI=</HashCode>
+      <FileName>ObjModels\Asiento.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.aAsiento">
+    <Position X="1.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAgAIAAKAAHAgAAAAAAAAAACIBgEAAAAAAAAA=</HashCode>
+      <FileName>ObjModels\Asiento.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.AsientoComplejo">
+    <Position X="3.5" Y="5.5" Width="2.5" />
+    <InheritanceLine Type="ModuloContabilidad.ObjModels.aAsiento" FixedToPoint="true">
+      <Path>
+        <Point X="2.625" Y="4.555" />
+        <Point X="2.625" Y="5.125" />
+        <Point X="4.75" Y="5.125" />
+        <Point X="4.75" Y="5.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAADAgAAAAAAAAAAAABgEAAAAAAAAA=</HashCode>
+      <FileName>ObjModels\AsientoComplejo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.AsientoSimple">
+    <Position X="0.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAADAgAAAAAAAAAAAABgEAAAAAAAAA=</HashCode>
+      <FileName>ObjModels\AsientoSimple.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.ComunidadContabilidad" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAABAA4AAAAAAAAAAAAAAAAAAAEAAgABAAAAAAA=</HashCode>
+      <FileName>ObjModels\ComunidadContabilidad.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.ObjModels.LedgeAccount">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAQAAAEAAAAhAgAAAAAAAAACAAAAEAABABEA=</HashCode>
+      <FileName>ObjModels\LedgeAccount.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Properties.Resources" Collapsed="true">
+    <Position X="17" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.Properties.Settings" Collapsed="true">
+    <Position X="18.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>SAAAAAAAAAAAAACAAAAAIQAAEAABAAAAAAAAAAAIAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpanderTabs.TabExpTabBuscarUC" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.75" Y="6.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabExpTabBuscarUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpanderTabs.TabExpTabCuentaUC" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.75" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabExpTabCuentaUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ModuloContabilidad.TabbedExpanderTabs.TabExpTabDiarioUC" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TabbedExpanderTabs\TabExpTabDiarioUC.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="ModuloContabilidad.Mayor_SearchType">
+    <Position X="11.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAiAEAAAEAAAAAAAAAAQAAAAoAAAAAAAA=</HashCode>
+      <FileName>ViewModel\VMTabMayor.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

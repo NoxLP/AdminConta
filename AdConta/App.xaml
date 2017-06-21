@@ -1,0 +1,119 @@
+﻿<Application x:Class="AdConta.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:main="clr-namespace:AdConta"
+             xmlns:converters="clr-namespace:Converters;assembly=Converters"
+             xmlns:ModuloContabilidad="clr-namespace:ModuloContabilidad;assembly=ModuloContabilidad"
+             xmlns:ModuloGestion="clr-namespace:ModuloGestion;assembly=ModuloGestion"
+             xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
+             xmlns:TabbedExpander="clr-namespace:TabbedExpanderCustomControl;assembly=TabbedExpanderCustomControl"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<ResourceDictionary Source="/Resources/TabbedExpander.xaml"/>
+                <ResourceDictionary Source="/Resources/GlassButton.xaml"/>
+                <ResourceDictionary Source="/Resources/GlassIcon.xaml"/>
+                <ResourceDictionary Source="/Resources/RibbonStyles.xaml"/>-->
+                <ResourceDictionary Source="/Resources/CloseTabButton.xaml"/>
+                <ResourceDictionary Source="/Resources/PinButton.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/TabbedExpanderCustomControl;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/Resources/AbleTabControlResources.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModuloContabilidad;component/Resources/ContabilidadRD.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--Visuals Datagrid styles-->
+            <!--Window caption buttons geometry-->
+            <Geometry x:Key="closeGeometry">F1 M 151,217L 152,217L 154.5,219.5L 157,217L 158,217L 158,218L 155.5,220.5L 158,223L 158,224L 157,224L 154.5,221.5L 152,224L 151,224L 151,223L 153.5,220.5L 151,218L 151,217 Z</Geometry>
+            <Geometry x:Key="minimizeGeometry">M0,0 L8,0 8,1 8,2 0,2 0,1 z</Geometry>
+            <Geometry x:Key="maximizeGeometry">F1 M 34,17L 43,17L 43,23L 34,23L 34,17 Z M 35,19L 35,22L 42,22L 42,19L 35,19 Z</Geometry>
+            <Geometry x:Key="restoreGeometry">M1,4.9996096 L1,7.000219 7,6.999219 7,5.001 2,5.001 2,4.9996096 z M3,2.0014141 L3,3.0000001 8,3.0000001 8,4.0000001 8,4.0008045 9,4.0008045 9,2.0014141 z M2,0 L10,0 10,0.0010234118 10,1.0000001 10,5.001 8,5.001 8,7.9990235 0,8.0000239 0,4.0000001 0,3.0009998 0,3.0000001 2,3.0000001 2,1.0000001 2,0.0010234118 z</Geometry>
+
+            <!--Visuals-->
+            <BitmapImage x:Key="PinPng" UriSource="/Resources/forum-pin-icon.png"/>
+            <Style TargetType="{x:Type Window}">
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="13"/>
+            </Style>
+            <SolidColorBrush x:Key="BackgroundAppColor" Color="#FFE6E6E1"/>
+            <SolidColorBrush x:Key="BackgroundExpandersColor" Color="White"/>
+            <SolidColorBrush x:Key="BackgroundSelectedExpTabColor" Color="{Binding Color, Source={StaticResource BackgroundAppColor}}"/>
+            <SolidColorBrush x:Key="MayorDGridBackground" Color="{Binding Color, Source={StaticResource BackgroundAppColor}}"/>
+            <SolidColorBrush x:Key="TabExpSelectedTabBackground" Color="{Binding Color, Source={StaticResource BackgroundAppColor}}"/>
+            <!--Data column header center text alignment-->
+            <Style x:Key="DGridHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <TextBlock Text="{Binding BindsDirectlyToSource=True}" Width="Auto" TextAlignment="Center" FontSize="13" 
+            					HorizontalAlignment="Center"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!--Data column header left text alignment-->
+            <Style x:Key="DGridLeftHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <TextBlock Text="{Binding BindsDirectlyToSource=True}" Width="Auto" TextAlignment="Left" FontSize="13" 
+            					HorizontalAlignment="Left"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!--Data column cell alignment-->
+            <Style x:Key="DGridCenterCellStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Margin" Value="2,0,2,0"/>
+            </Style>
+            <Style x:Key="DGridCenterCheckBCellStyle" TargetType="{x:Type CheckBox}">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Margin" Value="2,0,2,0"/>
+            </Style>
+            <Style x:Key="DGridLeftCellStyle" BasedOn="{StaticResource DGridCenterCellStyle}" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextAlignment" Value="Left"/>
+            </Style>
+            <Style x:Key="DGridRightCellStyle" BasedOn="{StaticResource DGridCenterCellStyle}" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextAlignment" Value="Right"/>
+            </Style>
+            <!--Status grid cell alignment-->
+            <Style x:Key="StatusDGridCenterCellStyle" TargetType="{x:Type TextBlock}">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="Margin" Value="2,0,2,0"/>
+                <Setter Property="Background" Value="{Binding Source={StaticResource MayorDGridBackground}}"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="StatusDGridLeftCellStyle" BasedOn="{StaticResource StatusDGridCenterCellStyle}" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextAlignment" Value="Left"/>
+            </Style>
+            <Style x:Key="StatusDGridRightCellStyle" BasedOn="{StaticResource StatusDGridCenterCellStyle}" TargetType="{x:Type TextBlock}">
+                <Setter Property="TextAlignment" Value="Right"/>
+            </Style>
+            <!--Data grid cell background = mayor tab background-->
+            <Style x:Key="CellBackgroundGray" TargetType="{x:Type DataGridCell}">
+                <Setter Property="Background" Value="{Binding Source={StaticResource MayorDGridBackground}}"/>
+            </Style>
+
+            <!--DataTemplates for general tabs-->
+            <DataTemplate x:Key="TabMayor" DataType="{x:Type ModuloContabilidad:VMTabMayor}">
+                <ModuloContabilidad:TabMayorUC/>
+            </DataTemplate>
+            <DataTemplate x:Key="TabDiario" DataType="{x:Type ModuloContabilidad:VMTabDiario}">
+                <ModuloContabilidad:TabDiarioUC/>
+            </DataTemplate>
+            <DataTemplate x:Key="TabProps" DataType="{x:Type ModuloGestion:VMTabProps}">
+                <ModuloGestion:TabPropsUC/>
+            </DataTemplate>
+            <DataTemplate x:Key="TabCdad" DataType="{x:Type main:VMTabCdad}">
+                <main:TabCdadUC/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{441F08BB-C1E9-484A-8ECB-F661004BF47F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Repository</RootNamespace>
+    <AssemblyName>Repository</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Repositories\ApunteRepository.cs" />
+    <Compile Include="Repositories\AsientoRepository.cs" />
+    <Compile Include="Repositories\ComunidadRepository.cs" />
+    <Compile Include="Repositories\CuentaMayorRepository.cs" />
+    <Compile Include="Repositories\PropietarioRepository.cs" />
+    <Compile Include="RepositoryBase\aRepositoryBase.cs" />
+    <Compile Include="RepositoryBase\ConditionsToCommitSQL.cs" />
+    <Compile Include="RepositoryBase\iRepository.cs" />
+    <Compile Include="ObjModels\GrupoGasto.cs" />
+    <Compile Include="ObjModels\Presupuesto.cs" />
+    <Compile Include="RepositoryBase\iAppRepositories.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\PersonaRepository.cs" />
+    <Compile Include="UnitOfWork.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GeneralHelpers\GeneralHelpers.csproj">
+      <Project>{419b406e-5a8b-4ebc-ac38-bcf9e5fee940}</Project>
+      <Name>GeneralHelpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GlobalSettings\GlobalSettings.csproj">
+      <Project>{697dc7b8-7608-4b68-970b-1e67be52979b}</Project>
+      <Name>GlobalSettings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{941a90cb-1636-48bb-9a7b-bc560ea30ba9}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_Contabilidad\ObjModels_Contabilidad.csproj">
+      <Project>{d4ac8b21-1ffc-4b13-ad1c-ca3d7cb5c497}</Project>
+      <Name>ObjModels_Contabilidad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_Gestion\ObjModels_Gestion.csproj">
+      <Project>{6086eaa3-02ee-4e05-a9a9-3362488be42a}</Project>
+      <Name>ObjModels_Gestion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ViewModel\ViewModel.csproj">
+      <Project>{6cc0248d-705d-4d99-a665-22ff68ec8e37}</Project>
+      <Name>ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

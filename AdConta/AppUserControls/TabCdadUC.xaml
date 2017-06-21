@@ -1,0 +1,319 @@
+﻿<!--USER CONTROL VIEW FOR TAB OF TYPE CDADES-->
+    <UserControl x:Class="AdConta.TabCdadUC"
+             x:Name="RootTabCdad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
+             xmlns:converters="clr-namespace:Converters;assembly=Converters"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="500">
+    <UserControl.Resources>
+        <converters:StringFormatConverter x:Key="stringConverter"/>
+        <Style x:Key="TabCdadTabPanelStyle" TargetType="{x:Type ColumnDefinition}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Width" Value="5"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Width" Value="Auto"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="TabCdadHeaderFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="0" SnapsToDevicePixels="true" Stroke="Black" StrokeThickness="1" StrokeDashArray="1 2"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TabCdadLeftTabPanel" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="TogBorder" Padding="{TemplateBinding Padding}" BorderThickness="1" BorderBrush="Gray"
+                                HorizontalAlignment="Stretch" SnapsToDevicePixels="False">
+                            <ContentPresenter HorizontalAlignment="Center" Margin="1" TextBlock.TextAlignment="Center"
+                                              RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Top"/>                            
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TogBorder" Property="Background" Value="LightGray"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter TargetName="TogBorder" Property="Background" Value="{StaticResource BackgroundAppColor}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" Value="White"/>
+                                <Setter Property="IsChecked" Value="True"/>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}" 
+                                         Value="True">
+                                <Setter TargetName="TogBorder" Property="Background" Value="White"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <Border BorderBrush="Gray" BorderThickness="0.5" DockPanel.Dock="Top" Margin="58,4,3,0">
+            <DockPanel LastChildFill="False">
+                <UserControls:TBoxLabel x:Name="TabTBCod" HorizontalAlignment="Left" Margin="8,3,0,8" VerticalAlignment="Center" 
+                                        Height="Auto" TBWidth="45" Label="Código" DockPanel.Dock="Left"
+                                        Text="{Binding TabComCod, Mode=TwoWay}" TBTextAlignment="Right" TBReadOnly="{Binding ModifyDataAllowed}"/>
+                <Button x:Name="TabButNext" Content="->" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,8,8" Height="30" Width="30"
+                                DockPanel.Dock="Right" Command="{Binding NextRecord}"/>
+                <Button x:Name="TabButPrev" Content="/-" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,8" Height="30" Width="30"
+                                DockPanel.Dock="Right" Command="{Binding PrevRecord}"/>
+                <Button x:Name="TabButMod" Content="Mod" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,6,8" Height="30" Width="38"
+                                DockPanel.Dock="Right" Command="{Binding ModifyCommand}"/>
+                <!--, AncestorType={x:Type TabItem}-->
+                <!--"{Binding Source={StaticResource VMTabCdad}, Path=ModifyCommand}"/>-->
+                <Button x:Name="TabButSave" Content="Gua" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,8" Height="30" Width="38"
+                                DockPanel.Dock="Right" Command="{Binding SaveCommand}"/>
+                        <!--IsEnabled="{Binding ModifyDataAllowed}"/>
+                {Binding Source={StaticResource VMTabCdad}, Path=ModifyDataAllowed, Mode=OneWay}"/>-->
+            </DockPanel>
+        </Border>
+        <TabControl x:Name="TabCdadTabControl" TabStripPlacement="Left" Margin="0,4,3,3" Padding="0" VerticalAlignment="Stretch" Height="Auto"
+                    BorderBrush="Gray" BorderThickness="1">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Background" Value="#FFDBDBDB"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <ToggleButton Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Header}" 
+                                              IsHitTestVisible="True"
+                                              HorizontalAlignment="Stretch"
+                                              Width="{Binding ElementName=RootTabCdad, Path=DataContext.TabPanelWidth, Mode=OneWay}"
+                                              Padding="2" Margin="0"
+                                              Style="{StaticResource TabCdadLeftTabPanel}"
+                                              FocusVisualStyle="{StaticResource TabCdadHeaderFocusVisual}"
+                                              Click="ToggleButton_Click"
+                                              MouseEnter="Tog_MouseEnter"
+                                              MouseLeave="Tog_MouseLeave"/>
+                                <!--Tag="{Binding ElementName=RootTabCdad, Path=DataContext.TabPanelWidth, Mode=TwoWay}""{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}"-->
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="IsHitTestVisible" Value="True"/>
+                    <Setter Property="AllowDrop" Value="False"/>
+                </Style>
+                <Style x:Key="border" TargetType="Border">
+                    <!-- <Border x:Key="border" BorderBrush="LightGray" BorderThickness="1" Margin="2"/>-->
+                    <Setter Property="BorderBrush" Value="Gray"/>
+                    <Setter Property="BorderThickness" Value="0.5"/>
+                    <Setter Property="Margin" Value="3"/>
+                    <Setter Property="Background" Value="WhiteSmoke"/>
+                </Style>
+            </TabControl.Resources>
+            <TabControl.Template>
+                <ControlTemplate TargetType="{x:Type TabControl}">
+                    <Grid KeyboardNavigation.TabNavigation="Local" Margin="0" x:Name="TabCGridCol" Background="{StaticResource BackgroundAppColor}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" x:Name="TabCGridCol0"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TabPanel x:Name="tabpanel"
+                                  Grid.Column="0" 
+                                  HorizontalAlignment="Left"
+                                  MaxWidth="75" 
+                                  IsItemsHost="True" 
+                                  KeyboardNavigation.TabIndex="1"
+                                  Margin="0,2.5,0,0"/>
+                        <Border Grid.Column="1" HorizontalAlignment="Stretch" BorderBrush="Gray" BorderThickness="0.5" Margin="0,1,1,1"
+                                Background="{StaticResource BackgroundAppColor}">
+                        <ContentPresenter Name="PART_SelectedContentHost" ContentSource="SelectedContent"
+                                          VerticalAlignment="Stretch" Height="Auto" 
+                                          HorizontalAlignment="Stretch" Width="Auto"
+                                          Margin="0" 
+                                          KeyboardNavigation.TabNavigation="Local"
+                                          KeyboardNavigation.DirectionalNavigation="Contained"
+                                          KeyboardNavigation.TabIndex="2"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </TabControl.Template>
+            <TabItem Header="General">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0"></Grid>
+                    <Grid Grid.Row="1">
+                        <Border Style="{StaticResource border}"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,3,0,0">
+                                <DockPanel LastChildFill="True">
+                                    <UserControls:TBoxLabel x:Name="TabTBCIF" HorizontalAlignment="Left" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="100" Label="C.I.F." 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding CIF}"/>
+                                    <!--"{Binding Source={StaticResource VMTabCdad},Path=CIF}"/>-->
+                                    <UserControls:TBoxLabel x:Name="TabTBNombre" HorizontalAlignment="Stretch" Margin="8,0,8,0" VerticalAlignment="Center" 
+                                                                Height="Auto" TBWidth="NaN" Label="Nombre" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding Nombre, Mode=TwoWay}"/>
+                                    <!--"{Binding Source={StaticResource VMTabCdad},Path=Nombre}"/>-->
+                                </DockPanel>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="0,3,0,0">
+                                <DockPanel LastChildFill="True">
+                                    <UserControls:TBoxLabel x:Name="TabTBTipoCalle" HorizontalAlignment="Left" Margin="8,0,0,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="35" Label="" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding TipoCalle}"/>
+                                    <!--"{Binding Source={StaticResource VMTabCdad},Path=TipoCalle}"/>-->
+                                    <UserControls:TBoxLabel x:Name="TabTBDireccion" HorizontalAlignment="Stretch" Margin="8,0,8,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="NaN" Label="Dirección" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding Direccion}"/>
+                                </DockPanel>
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <DockPanel LastChildFill="True">
+                                    <UserControls:TBoxLabel x:Name="TabTBCP" HorizontalAlignment="Left" Margin="8,0,0,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="63" Label="Cód. Postal" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding CP}"/>
+                                    <UserControls:TBoxLabel x:Name="TabTBLocalidad" HorizontalAlignment="Left" Margin="8,0,0,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="185" Label="Localidad" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"
+                                                                Text="{Binding Localidad}"/>
+                                    <UserControls:TBoxLabel x:Name="TabTBPoblacion" HorizontalAlignment="Stretch" Margin="8,0,8,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="NaN" Label="Población" 
+                                                                TBReadOnly="{Binding ReadOnlyALL}"/>
+                                </DockPanel>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid Grid.Row="2" Margin="0,0,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="248"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="1">
+                                <Border Style="{StaticResource border}" VerticalAlignment="Stretch" Height="Auto"/>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <DockPanel LastChildFill="True">
+                                            <UserControls:TBoxLabel x:Name="TabTBIBAN" HorizontalAlignment="Left" Margin="8,3,4,8" VerticalAlignment="Center"
+                                                                    Height="Auto" TBWidth="38" Label="IBAN" 
+                                                                    TBReadOnly="{Binding ReadOnlyALL}" Text="{Binding Cuenta_IBAN}"/>
+                                            <UserControls:TBoxLabel x:Name="TabTBBanco" HorizontalAlignment="Left" Margin="0,3,4,8" VerticalAlignment="Center"
+                                                                    Height="Auto" TBWidth="38" Label="Banco" TBReadOnly="{Binding ReadOnlyALL}" 
+                                                                    Text="{Binding Cuenta_Banco, Converter={StaticResource stringConverter}, ConverterParameter=PADLEFT4}"/>
+                                            <UserControls:TBoxLabel x:Name="TabTBOfic" HorizontalAlignment="Left" Margin="0,3,3,8" VerticalAlignment="Center"
+                                                                    Height="Auto" TBWidth="38" Label="Ofic." TBReadOnly="{Binding ReadOnlyALL}" 
+                                                                    Text="{Binding Cuenta_Ofic, Converter={StaticResource stringConverter}, ConverterParameter=PADLEFT4}"/>
+                                            <UserControls:TBoxLabel x:Name="TabTBDC" HorizontalAlignment="Left" Margin="0,3,4,8" VerticalAlignment="Center"
+                                                                    Height="Auto" TBWidth="23" Label="D.C." TBReadOnly="{Binding ReadOnlyALL}" 
+                                                                    Text="{Binding Cuenta_DC, Converter={StaticResource stringConverter}, ConverterParameter=PADLEFT2}"/>
+                                            <UserControls:TBoxLabel x:Name="TabTBCuenta" HorizontalAlignment="Stretch" Margin="0,3,8,8" VerticalAlignment="Center"
+                                                                    Height="Auto" TBWidth="NaN" Label="Cuenta" TBReadOnly="{Binding ReadOnlyALL}" 
+                                                                    Text="{Binding Cuenta_Cuenta, Converter={StaticResource stringConverter}, ConverterParameter=PADLEFT10}"/>
+                                        </DockPanel>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <UserControls:TBoxLabel x:Name="TabTBFechaPunt" HorizontalAlignment="Left" Margin="8,0,0,8" VerticalAlignment="Center"
+                                                                Height="Auto" TBWidth="78" Label="Fecha punteo"
+                                                                TBReadOnly="{Binding ReadOnlyALL}" 
+                                                                Text="{Binding FechaPunteo, Converter={StaticResource stringConverter}, ConverterParameter=DATEd}"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button x:Name="TabButCopyAcc" Content="Copia CCC" HorizontalAlignment="Right" Margin="0,0,8,0" 
+                                                    VerticalAlignment="Center" Height="Auto" Command="{Binding CopyAccount}"/>
+                                            <Button x:Name="TabButPasteAcc" Content="Pega CCC" HorizontalAlignment="Right" Margin="0,0,8,0" 
+                                                    VerticalAlignment="Center" Height="Auto" Command="{Binding PasteAccount}"/>
+                                                    <!--IsEnabled="{Binding ModifyDataAllowed}"/>-->
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <!--&#x0a;-->
+            <TabItem Header="Junta &#x0a; Directiva">
+                <Grid Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource border}" HorizontalAlignment="Left" VerticalAlignment="Stretch" Height="Auto" Width="380"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="TabButBuscaPresi" Content="Ficha" 
+                                        VerticalAlignment="Center" Height="Auto" Margin="10,0,0,0"/>
+                                <UserControls:TBoxLabel x:Name="TabTBPresidente" HorizontalAlignment="Left" Margin="10,3,0,8" VerticalAlignment="Center"
+                                                        Height="Auto" TBWidth="320" Label="Presidente/a" 
+                                                        TBReadOnly="{Binding ReadOnlyALL}" Text="{Binding Presidente}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="TabButBuscaSecre" Content="Ficha" 
+                                        VerticalAlignment="Center" Height="Auto" Margin="10,0,0,0"/>
+                                <UserControls:TBoxLabel x:Name="TabTBSecretario" HorizontalAlignment="Left" Margin="10,3,0,8" VerticalAlignment="Center"
+                                                        Height="Auto" TBWidth="320" Label="Secretario/a" 
+                                                        TBReadOnly="{Binding ReadOnlyALL}" Text="{Binding Secretario}"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <WrapPanel Orientation="Horizontal">
+                                <Button x:Name="TabButBuscaTesorero" Content="Ficha" 
+                                        VerticalAlignment="Center" Height="Auto" Margin="10,0,0,0"/>
+                                <UserControls:TBoxLabel x:Name="TabTBTesorero" HorizontalAlignment="Left" Margin="10,3,0,8" VerticalAlignment="Center"
+                                                        Height="Auto" TBWidth="320" Label="Tesorero/a" 
+                                                        TBReadOnly="{Binding ReadOnlyALL}" Text="{Binding Tesorero}"/>
+                            </WrapPanel>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <UserControls:TBoxLabel x:Name="TabTBVocales" HorizontalAlignment="Left" Margin="55,3,0,8" VerticalAlignment="Center"
+                                                    TBHeight="150" TBWidth="320" Label="Vocales" TextWrap="Wrap" AcceptsRet="True"
+                                                    TBReadOnly="{Binding ReadOnlyALL}" Text="{Binding Vocales}"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Notas">
+                <DockPanel LastChildFill="True">
+                    <Border Style="{StaticResource border}">
+                        <TextBox x:Name="TabTBNotas" Margin="3"
+                                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="Auto" Width="Auto"
+                                 TextWrapping="Wrap" AcceptsReturn="True"
+                                 IsReadOnly="{Binding ReadOnlyALL}" Text="{Binding Notas}"/>
+                    </Border>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>
