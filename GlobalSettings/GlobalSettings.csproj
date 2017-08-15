@@ -52,6 +52,14 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Properties\ContabilidadSettings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>ContabilidadSettings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Properties\MensajesErrorSettings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>MensajesErrorSettings.Designer.cs</LastGenOutput>
+    </None>
     <Resource Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -70,6 +78,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo1.cs" />
+    <Compile Include="Properties\ContabilidadSettings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>ContabilidadSettings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\MensajesErrorSettings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>MensajesErrorSettings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

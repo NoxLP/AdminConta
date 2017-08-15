@@ -15,100 +15,58 @@ using Extensions;
 
 namespace Repository
 {
-    public sealed class CuentaMayorRepository : aRepositoryBaseWithTwoOwners, IRepositoryInternal
+    public sealed class CuentaMayorRepository : aRepositoryBaseWithTwoOwners<CuentaMayor>, IRepositoryCRUD<CuentaMayor>
     {
         public CuentaMayorRepository()
         {
             MapperStore store = new MapperStore();
             this._Mapper = (DapperMapper<CuentaMayor>)store.GetMapper(GetObjModelType());
+            base.Transactions = new ConcurrentDictionary<aVMTabBase, List<Tuple<QueryBuilder, IConditionToCommit>>>();
         }
 
         #region fields
         /// <summary>
-        /// Newly objects added here till ApplyChangesAsync get called.
-        /// </summary>
-        private ConcurrentDictionary<aVMTabBase, HashSet<CuentaMayor>> _NewObjects = new ConcurrentDictionary<aVMTabBase, HashSet<CuentaMayor>>();
-        /// <summary>
-        /// Objects currently retrieved from DB.
-        /// </summary>
-        private ConcurrentDictionary<int, CuentaMayor> _ObjModels = new ConcurrentDictionary<int, CuentaMayor>();
-        /// <summary>
         /// Relations between owners, numCuenta and Id. Used to manage objects by numCuenta instead of by Id.
         /// </summary>
         private ConcurrentDictionary<Tuple<int, long>, int> _CuentasIds = new ConcurrentDictionary<Tuple<int, long>, int>();
-        /// <summary>
-        /// Original objects currently retrieved from DB. Deep copy of thos stored at _ObjModels. Used in the case of a rollback.
-        /// </summary>
-        private ConcurrentDictionary<int, CuentaMayor> _OriginalObjModels = new ConcurrentDictionary<int, CuentaMayor>();
-        /// <summary>
-        /// Objects removed are added here till ApplyChangesAsync get called.
-        /// </summary>
-        private ConcurrentDictionary<aVMTabBase, HashSet<CuentaMayor>> _ObjectsRemoved = new ConcurrentDictionary<aVMTabBase, HashSet<CuentaMayor>>();
-        /// <summary>
-        /// Objects type mapper. Initialized at constructor.
-        /// </summary>
-        private DapperMapper<CuentaMayor> _Mapper;
         #endregion
 
-        #region properties
-        public ConcurrentDictionary<aVMTabBase, List<Tuple<QueryBuilder, IConditionToCommit>>> Transactions { get; private set; }
-        #endregion
-
-        #region helpers
-        public override Type GetObjModelType()
-        {
-            return typeof(CuentaMayor);
-        }
-        void IRepositoryInternal.NewVM(aVMTabBase VM)
-        {
-            base._RepoSphr.Wait();
-            if (!this.Transactions.ContainsKey(VM)) this.Transactions.TryAdd(VM, new List<Tuple<QueryBuilder, IConditionToCommit>>());
-            if (!this._NewObjects.ContainsKey(VM)) this._NewObjects.TryAdd(VM, new HashSet<CuentaMayor>());
-            if (!this._ObjectsRemoved.ContainsKey(VM)) this._ObjectsRemoved.TryAdd(VM, new HashSet<CuentaMayor>());
-            if (!base._DirtyMembers.ContainsKey(VM)) base._DirtyMembers.TryAdd(VM, new Dictionary<int, string[]>());
-            base._RepoSphr.Release();
-        }
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        async Task IRepositoryInternal.RemoveVMTabReferences(aVMTabBase VM)
-        {
-            HashSet<CuentaMayor> setDump;
-            List<Tuple<QueryBuilder, IConditionToCommit>> lDump;
-            Dictionary<int, string[]> dDump;
-
-            base._RepoSphr.Wait();
-            this._NewObjects.TryRemove(VM, out setDump);
-            this.Transactions.TryRemove(VM, out lDump);
-            this._ObjectsRemoved.TryRemove(VM, out setDump);
-            base._DirtyMembers.TryRemove(VM, out dDump);
-            base._RepoSphr.Release();
-        }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-        async Task IRepositoryInternal.ApplyChangesAsync(aVMTabBase VM)
+        #region internal override
+        internal override async Task ApplyChangesAsync(aVMTabBase VM, Func<Task> doFirstInsideSemaphoreWaiting = null, Func<Task> doLastInsideSemaphoreWaiting = null)
         {
             await base._RepoSphr.WaitAsync();
-            foreach (CuentaMayor p in this._NewObjects[VM]) //All old new objects are now normal objects
+
+            //All old new objects are now normal objects
+            foreach (CuentaMayor objModel in base._NewObjects[VM])
             {
-                _ObjModels.TryAdd(p.Id, p); 
-                Tuple<int, long> key = new Tuple<int, long>(p.NumCuenta, p.IdOwnerComunidad.CantorPair(p.IdOwnerEjercicio));
-                this._CuentasIds.TryAdd(key, p.Id);
+                base._ObjModels.TryAdd(objModel.Id, objModel);
+                base._VMsThatOwnsObjModels.AddOrUpdate(
+                    objModel.Id,
+                    new HashSet<aVMTabBase>() { VM },
+                    (id, hashset) => new HashSet<aVMTabBase>(base._VMsThatOwnsObjModels[id].AddAndGetUpdatedHashSet(VM)));
+                Tuple<int, long> key = new Tuple<int, long>(objModel.NumCuenta, objModel.IdOwnerComunidad.CantorPair(objModel.IdOwnerEjercicio));
+                this._CuentasIds.TryAdd(key, objModel.Id);
             }
-            this._NewObjects[VM].Clear(); //Therefore, clear new objects
-            this.Transactions[VM].Clear(); //Transactions made, clear transactions
-            this._ObjectsRemoved[VM].Clear(); //Apply deletes
-            base._DirtyMembers[VM].Clear(); //Clear objects members modified
-            base._RepoSphr.Release();
-        }
-        async Task IRepositoryInternal.RollbackRepoAsync(aVMTabBase VM)
-        {
-            await base._RepoSphr.WaitAsync();
+            base._NewObjects[VM].Clear(); //Therefore, clear new objects
 
+            base.Transactions[VM].Clear(); //Transactions made, clear transactions
+
+            //Apply deletes
+            CuentaMayor dump;
+            HashSet<aVMTabBase> hDump;
+            int iDump;
+            foreach (CuentaMayor objModel in base._ObjectsRemoved[VM])
+            {
+                base._OriginalObjModels.TryRemove(objModel.Id, out dump);
+                this._VMsThatOwnsObjModels.TryRemove(objModel.Id, out hDump);
+                Tuple<int, long> key = new Tuple<int, long>(objModel.NumCuenta, objModel.IdOwnerComunidad.CantorPair(objModel.IdOwnerEjercicio));
+                this._CuentasIds.TryRemove(key, out iDump);
+            }
+            base._ObjectsRemoved[VM].Clear();
+
+            //Apply members modified to original objects
             foreach (KeyValuePair<int, string[]> kvp in base._DirtyMembers[VM])
-                this._ObjModels[kvp.Key] = this._OriginalObjModels[kvp.Key]; //Change back al objects to their original state
-            //¡¡¡¡OJO!!!! This above only changes dictionary reference, if VM or others had a reference to the object, it will not GCollected AND
-            //the owner/s will maintain the reference to the bad, modified, "not-rollbacked" object.
-
-            this._NewObjects[VM].Clear(); //Clear new objects
-            this.Transactions[VM].Clear(); //Transactions made, clear transactions
+                base._OriginalObjModels[kvp.Key] = base._ObjModels[kvp.Key];
             base._DirtyMembers[VM].Clear(); //Clear objects members modified
 
             base._RepoSphr.Release();
@@ -122,10 +80,10 @@ namespace Repository
             QueryBuilder qBuilder = new QueryBuilder();
             var ownerConditions = GetCurrentOwnersCondition();
             qBuilder
-                .AddSelect(t)
-                .AddFrom(t)
-                .AddWhere(new SQLCondition("Codigo", "@codigo"))
-                .AddConditions("AND ", ownerConditions)
+                .Select(t)
+                .From(t)
+                .Where(new SQLCondition("Codigo", "@codigo"))
+                .Conditions("AND ", ownerConditions)
                 .SemiColon();
 
             qBuilder.StoreParameter("idCdad", CurrentCdadOwner);
@@ -165,11 +123,11 @@ namespace Repository
             Type t = GetObjModelType();
             QueryBuilder qBuilder = new QueryBuilder();
             qBuilder
-                .AddUpdate(t)
-                .AddUpdateSet(this._DirtyMembers[VM][id])
-                .AddWhere(new SQLCondition("Id", "@id"));
+                .Update(t)
+                .UpdateSet(this._DirtyMembers[VM][id])
+                .Where(new SQLCondition("Id", "@id"));
             qBuilder.StoreParametersFrom(this._ObjModels[id]);
-            qBuilder.StoreParameter("id", id);
+            qBuilder.StoreParameter("@id", id);
             return qBuilder;
         }
         private QueryBuilder GetInsertSQL(CuentaMayor cuenta)
@@ -177,11 +135,11 @@ namespace Repository
             Type t = GetObjModelType();
             QueryBuilder qBuilder = new QueryBuilder();
             qBuilder
-                .AddInsertInto()
-                .AddInsertFirstColumns(t)
+                .InsertInto()
+                .InsertFirstColumns(t)
                 .CloseBrackets()
-                .AddInsertValues()
-                .AddInsertValues(t)
+                .InsertValues()
+                .InsertValues(t)
                 .CloseBrackets()
                 .SemiColon();
             qBuilder.StoreParametersFrom(cuenta);
@@ -197,7 +155,7 @@ namespace Repository
         /// <param name="idCdad"></param>
         /// <param name="idEjer"></param>
         /// <returns></returns>
-        public async Task<CuentaMayor> GetByNumCuenta(int numCuenta, int idCdad, int idEjer)
+        public async Task<CuentaMayor> GetByNumCuentaAsync(int numCuenta, int idCdad, int idEjer, aVMTabBase VM)
         {
             long cantor = idCdad.CantorPair(idEjer);
             Tuple<int, long> key = new Tuple<int, long>(numCuenta, cantor);
@@ -207,7 +165,7 @@ namespace Repository
             {
                 int id = this._CuentasIds[key];
                 //Si la cuenta esta en _NewObjects no puede estar disponible hasta que se haga Apply
-                //Si la cuenta esta en _ObjectsRemoved no puede estar disponible por que esta esperando para ser borrada
+                //Si la cuenta esta en _ObjectsRemoved no puede estar disponible por que esta esperando para ser borrada                
                 if (!this._ObjModels.TryGetValue(id, out cuenta))
                     throw new CustomException_Repository(
                         "Se ha tratado de crear una cuenta que ya se está creando.");
@@ -224,26 +182,24 @@ namespace Repository
                     con.Close();
                 }
 
-                cuenta = await Task.Run(() => this._Mapper.Map(result)).ConfigureAwait(false);
+                cuenta = await Task.Run(() => base._Mapper.Map(result)).ConfigureAwait(false);
+                AddToDictionariesObjectRetrievedFromDBAsync(
+                    cuenta,
+                    await Task.Run(() => base._Mapper.Map(result)).ConfigureAwait(false),
+                    VM)
+                    .Forget()
+                    .ConfigureAwait(false);
 
                 await this._RepoSphr.WaitAsync();
-                //Add object retrieved from DB
-                this._OriginalObjModels.TryAdd(cuenta.Id, cuenta);
-                //Deep copy
-                this._ObjModels.TryAdd(cuenta.Id, await Task.Run(() => this._Mapper.Map(result)).ConfigureAwait(false));
-
-                this._CuentasIds.TryAdd(
-                    key,
-                    cuenta.Id);
-
+                this._CuentasIds.TryAdd(key, cuenta.Id);
                 this._RepoSphr.Release();
             }
             return cuenta;
         }
-        public async Task<CuentaMayor> GetById(int id)
+        public async Task<CuentaMayor> GetByIdAsync(int id, aVMTabBase VM)
         {
             CuentaMayor cuenta;
-            if (!this._ObjModels.TryGetValue(id, out cuenta))
+            if (!base._ObjModels.TryGetValue(id, out cuenta))
             {
                 QueryBuilder qBuilder = await Task.Run(() => GetSelectSQL(id)).ConfigureAwait(false);
                 dynamic result;
@@ -254,26 +210,27 @@ namespace Repository
                     con.Close();
                 }
 
-                await this._RepoSphr.WaitAsync();
-                //Add object retrieved from DB
-                this._OriginalObjModels.TryAdd(id, this._Mapper.Map(result));
-                //Deep copy
-                this._ObjModels.TryAdd(id, this._Mapper.Map(result));
+                cuenta = await Task.Run(() => base._Mapper.Map(result)).ConfigureAwait(false);
+                AddToDictionariesObjectRetrievedFromDBAsync(
+                    cuenta,
+                    await Task.Run(() => base._Mapper.Map(result)).ConfigureAwait(false),
+                    VM)
+                    .Forget()
+                    .ConfigureAwait(false);
 
+                await base._RepoSphr.WaitAsync();
                 this._CuentasIds.TryAdd(
                     new Tuple<int, long>(cuenta.NumCuenta, cuenta.IdOwnerComunidad.CantorPair(cuenta.IdOwnerEjercicio)),
                     cuenta.Id);
-
-                this._RepoSphr.Release();
-                return cuenta;
+                base._RepoSphr.Release();
             }
             return cuenta;
         }
-        public async Task<bool> AddNew(CuentaMayor cuenta, aVMTabBase VM)
+        public async Task<bool> AddNewAsync(CuentaMayor cuenta, aVMTabBase VM)
         {
             //¡¡¡¡OJO!!!!! AQUI HAY QUE AÑADIR "SELECT LAST_INSERT_ID()" MANUALMENTE AL QUERYBUILDER
             //El problema es que LAST_INSERT_ID() trabaja por conexion, por tanto si se realizan varios inserts no serviría de nada
-            if (!this._NewObjects[VM].Add(cuenta)) return false;
+            if (!base._NewObjects[VM].Add(cuenta)) return false;
 
             QueryBuilder SQL = await Task.Run(() => GetInsertSQL(cuenta)).ConfigureAwait(false);
             ConditionToCommitScalar<int> condition = new ConditionToCommitScalar<int>(ConditionTCType.greater, -1);
@@ -281,34 +238,29 @@ namespace Repository
             var tuple = new Tuple<QueryBuilder, IConditionToCommit>(SQL, condition);
 
             await base._RepoSphr.WaitAsync();
-
             this._CuentasIds.TryAdd(
                     new Tuple<int, long>(cuenta.NumCuenta, cuenta.IdOwnerComunidad.CantorPair(cuenta.IdOwnerEjercicio)),
                     cuenta.Id);
-
-            if (this.Transactions[VM].Contains(tuple)) return false;
-            else this.Transactions[VM].Add(tuple);
-
             base._RepoSphr.Release();
+
+            if (!await AddTransactionWaitingForCommitAsync(tuple, VM))
+            {
+                base._NewObjects[VM].Remove(cuenta);
+                return false;
+            }
             return true;
         }
-        public async Task<bool> Update(CuentaMayor cuenta, aVMTabBase VM)
+        public async Task<bool> UpdateAsync(CuentaMayor cuenta, aVMTabBase VM)
         {
             QueryBuilder SQL = await Task.Run(() => GetUpdateSQL(cuenta.Id, VM)).ConfigureAwait(false);
             if (SQL == null) return false;
 
             ConditionToCommitScalar<int> condition = new ConditionToCommitScalar<int>(ConditionTCType.equal, 1);
             var tuple = new Tuple<QueryBuilder, IConditionToCommit>(SQL, condition);
-
-            await base._RepoSphr.WaitAsync();
-
-            if (this.Transactions[VM].Contains(tuple)) return false;
-            else this.Transactions[VM].Add(tuple);
-
-            base._RepoSphr.Release();
-            return true;
+            
+            return await AddTransactionWaitingForCommitAsync(tuple, VM);
         }
-        public async Task<bool> Remove(CuentaMayor cuenta, aVMTabBase VM)
+        public async Task<bool> RemoveAsync(CuentaMayor cuenta, aVMTabBase VM)
         {
             if (!this._ObjModels.ContainsKey(cuenta.Id)) return false;
 
@@ -316,18 +268,13 @@ namespace Repository
             ConditionToCommitScalar<int> condition = new ConditionToCommitScalar<int>(ConditionTCType.equal, 1);
             var tuple = new Tuple<QueryBuilder, IConditionToCommit>(SQL, condition);
 
+            if (!await AddTransactionWaitingForCommitAsync(tuple, VM)) return false;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            RemoveObjectWaitingForCommitAsync(cuenta, VM).Forget().ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
             await base._RepoSphr.WaitAsync();
 
-            if (this.Transactions[VM].Contains(tuple)) return false;
-            else this.Transactions[VM].Add(tuple);
-
-            this._ObjectsRemoved[VM].Add(cuenta); //Add object to ObjectsRemoved for later commit or rollback
-
-            CuentaMayor dump;
-            this._ObjModels.TryRemove(cuenta.Id, out dump);
-            this._OriginalObjModels.TryRemove(cuenta.Id, out dump); //Doesn't matter if this one really had or not the object before, because the object
-            //could be added before by the VM, and in that case it would be added only to this._ObjModels
-            
             int idump;
             Tuple<int, long> key = new Tuple<int, long>(cuenta.NumCuenta, cuenta.IdOwnerComunidad.CantorPair(cuenta.IdOwnerEjercicio));
             this._CuentasIds.TryRemove(key, out idump);

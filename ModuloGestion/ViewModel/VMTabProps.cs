@@ -15,15 +15,9 @@ namespace ModuloGestion
     {
         public VMTabProps()
         {
-            base.Type = TabType.Props;
+            base.TabType = TabType.Props;
             //this.TabComCod = (Application.Current.MainWindow.DataContext as VMMain).LastComCod;
-            try { base.InitializeComcod((int)Messenger.Messenger.SearchMsg("LastComCod")); }
-            catch (Exception)
-            {
-                MessageBox.Show("No se pudo abrir la pestaña de libro mayor por falta del código de Comunidad");
-                return;
-            }
-            InitUoWAsync().Forget().ConfigureAwait(false);
+            InitializeUoW();
         }
 
         #region properties
@@ -51,17 +45,17 @@ namespace ModuloGestion
         /// Llamado por AbleTabControl cuando se cierra la pestaña
         /// </summary>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public override async Task CleanUnitOfWork()
+        public override async Task CleanUnitOfWorkAsync()
         {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            this.UOW.RemoveVMTabReferencesFromRepos().Forget().ConfigureAwait(false);
+            this.UOW.RemoveVMTabReferencesFromReposAsync().Forget().ConfigureAwait(false);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
-        public override async Task InitUoWAsync()
+        public override void InitializeUoW()
         {
-            iAppRepositories appRepos = (iAppRepositories)Application.Current;
-            HashSet<IRepository> repos = new HashSet<IRepository>();
+            IAppRepositories appRepos = (IAppRepositories)Application.Current;
+            HashSet<aRepositoryInternal> repos = new HashSet<aRepositoryInternal>();
             
             repos.Add(appRepos.PropietarioRepo);
             this.UOW = new UnitOfWork(repos, this);
@@ -70,5 +64,14 @@ namespace ModuloGestion
         }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         #endregion
+        
+        public override void OnChangedEjercicio(int newCodigoEjercicio)
+        {
+            throw new NotImplementedException();
+        }
+        public override void OnChangedComunidad(int newCodigoComunidad)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

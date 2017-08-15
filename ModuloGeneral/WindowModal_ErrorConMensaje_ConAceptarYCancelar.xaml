@@ -1,0 +1,28 @@
+﻿<Window x:Class="ModuloGeneral.WindowModal_ErrorConMensaje_ConAceptarYCancelar"
+        x:Name="Root"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModuloGeneral"
+        mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
+        Background="{StaticResource BackgroundAppColor}"
+        WindowStartupLocation="CenterScreen"
+        Title="WindowModal_ErrorConMensaje_ConAceptarYCancelar" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <TextBlock x:Name="TBTitulo" HorizontalAlignment="Left" Text="{Binding ElementName=Root, Path=Titulo}" Margin="10,10,10,5" Foreground="Red" FontWeight="Bold"/>
+            <TextBlock x:Name="TBCuerpo" HorizontalAlignment="Left" Text="{Binding ElementName=Root, Path=MensajeError}" Margin="10,5,10,10"/>
+        </StackPanel>
+        <DockPanel LastChildFill="False" Grid.Row="1">
+            <Button x:Name="ButAceptar" Content="{Binding ElementName=Root, Path=TextoBotonAceptar}" DockPanel.Dock="Left" Width="70" Height="25" Margin="30,0,10,0" IsDefault="True"
+                    Click="ButAceptar_Click"/>
+            <Button x:Name="ButCancelar" Content="{Binding ElementName=Root, Path=TextoBotonCancelar}" DockPanel.Dock="Right" Width="70" Height="25" Margin="10,0,30,0" IsCancel="True"/>
+        </DockPanel>
+    </Grid>
+</Window>

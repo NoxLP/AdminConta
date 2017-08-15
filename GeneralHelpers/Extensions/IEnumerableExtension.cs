@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Extensions
 {
@@ -24,6 +25,16 @@ namespace Extensions
                 if (knownKeys.Add(keySelector1(element).CantorPair(keySelector2(element))))
                     yield return element;
             }
+        }
+        public static bool IsNullOrEmptyOrAllElementsAreNull<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null) return true; //Is null => true
+            if (source.Count() < 1) return true; //Is empty => true
+
+            foreach (TSource obj in source)
+                if (obj != null) return false; //Any element is NOT null => false
+
+            return true; //All elements are null => true
         }
     }
 }

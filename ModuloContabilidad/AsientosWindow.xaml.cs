@@ -26,7 +26,7 @@ namespace ModuloContabilidad
             InitializeComponent();
         }
 
-        public void AddExpanderUserControl(VMAsientoSimple vm)
+        public void AddExpanderUserControl(TabExpTabAsientoVM vm)
         {
             this.CPresenter.Content = vm;
             //DataGrid DGrid = this.CPresenter.FindVisualChild<DataGrid>(x => (x as DataGrid).Name == "DGridAsiento");
@@ -37,7 +37,7 @@ namespace ModuloContabilidad
         public void MoveUserControlToAbleTabcontrol(object sender, EventArgs e)
         {
             //AsientoSimple ASUC = this.CPresenter.Content as AsientoSimple;//FindFirstVisualChildren<AsientoSimple>();
-            VMAsientoSimple VM = this.CPresenter.Content as VMAsientoSimple;
+            TabExpTabAsientoVM VM = this.CPresenter.Content as TabExpTabAsientoVM;
             VM.PinButtonVisibility = Visibility.Visible;
             VM.IsWindowed = false;
             //ViewModel.TabsWithTabbedExpVM baseT = VM.BaseTab;// as ViewModel.VMTabBase;

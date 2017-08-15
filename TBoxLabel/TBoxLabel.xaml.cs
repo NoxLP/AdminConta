@@ -87,6 +87,9 @@ namespace AdConta.UserControls
 
         public static readonly DependencyProperty EnterKeyBindingProperty =
             DependencyProperty.Register("EnterKeyBinding", typeof(ICommand), typeof(TBoxLabel), new PropertyMetadata(OnEnterKeyBindingChange));
+        
+        public static readonly DependencyProperty LabelPositionProperty =
+            DependencyProperty.Register("LabelPosition", typeof(Dock), typeof(TBoxLabel), new PropertyMetadata(Dock.Top));
         #endregion
 
         #region public and OnChangeHandlers
@@ -190,6 +193,11 @@ namespace AdConta.UserControls
             {
                 control.EnterKeyBinding = (ICommand)e.NewValue;
             }
+        }
+        public Dock LabelPosition
+        {
+            get { return (Dock)GetValue(LabelPositionProperty); }
+            set { SetValue(LabelPositionProperty, value); }
         }
         #endregion
         #endregion

@@ -44,6 +44,12 @@
     <Setting Name="ORDERPROPS" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ORDER BY Dni</Value>
     </Setting>
+    <Setting Name="ORDERCDADES" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">ORDER BY Codigo</Value>
+    </Setting>
+    <Setting Name="NOMBRECUENTADEFAULT" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Banco</Value>
+    </Setting>
     <Setting Name="conta1ConnectionString" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -51,11 +57,11 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=e:\AdConta\AdConta\AdConta\conta1.mdf;Integrated Security=True</Value>
     </Setting>
-    <Setting Name="ORDERCDADES" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">ORDER BY Codigo</Value>
+    <Setting Name="ULTIMACUENTAMAYOR" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="NOMBRECUENTADEFAULT" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Banco</Value>
+    <Setting Name="NOMBREAPPINTERNO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">AdminConta</Value>
     </Setting>
   </Settings>
 </SettingsFile>

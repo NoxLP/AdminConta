@@ -667,6 +667,8 @@ the member have been configurated before with a member creator, as nested or as 
         /// F.i. if you have "interface iPerson", "class Customer : iPerson" and use 
         /// AddInterfaceToObjectCondition<iPerson>(FuncCondition, typeof(Customer)), the mapper of "iPerson" will create "Customer" objects when
         /// the condition will be satisfied.
+        /// Different conditions for different types will be resolved in the same order one configurate them, therefore an always-true (like (x => true))
+        /// last condition could be used to establish a sort of default type.
         /// </summary>
         /// <typeparam name="TInterface"></typeparam>
         /// <param name="condition"></param>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +59,7 @@ namespace Converters
             bool IsExpanded = (bool)values[0];
             double dProperty = (double)values[1];
             double notExpandedHeight = (double)values[2];
-            switch(param)
+            switch (param)
             {
                 case "GRID":
                     return (IsExpanded ? new GridLength(dProperty) : new GridLength(notExpandedHeight));
@@ -89,6 +90,7 @@ namespace Converters
             return null;
         }
     }
+
     /// <summary>
     /// Converter for Splitter visibility.
     /// </summary>
@@ -106,9 +108,12 @@ namespace Converters
 
             switch (param)
             {
-                case "TESplitter":
+                case "FalseCollapsed": //Default
                     bool bValue = (bool)value;
                     return bValue ? Visibility.Visible : Visibility.Collapsed;
+                case "TrueCollapsed":
+                    bValue = (bool)value;
+                    return bValue ? Visibility.Collapsed : Visibility.Visible;
                 default:
                     return value;
             }
@@ -117,6 +122,58 @@ namespace Converters
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Converter for Splitter visibility.
+    /// </summary>
+    [ValueConversion(typeof(object), typeof(bool))]
+    public class BoolToVisibilityMultiConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string param = parameter as string;
+
+            if (values == null || targetType == null)
+                return null;
+            else if (parameter == null)
+                return null;
+
+            if (values[0].GetType() != typeof(bool)) return null;
+
+            switch (param)
+            {
+                case "FalseCollapsed": //Default
+                    bool bValue = values.Any(x => (bool)x);
+                    return bValue ? Visibility.Visible : Visibility.Collapsed;
+                default:
+                    return null;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    public class BoolInverterConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value == null || targetType == null)
+                return null;
+
+            return !((bool)value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || targetType == null)
+                return null;
+
+            return !((bool)value);
         }
     }
 }

@@ -1,0 +1,26 @@
+﻿<Window x:Class="ModuloGeneral.WindowModel_Confirmacion_ConAceptarYCancelar"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModuloGeneral"
+        SizeToContent="WidthAndHeight"
+        Background="{StaticResource BackgroundAppColor}"
+        WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d"
+        Title="WindowModel_Confirmacion_ConAceptarYCancelar" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <TextBlock x:Name="TBCuerpo" HorizontalAlignment="Left" Text="{Binding ElementName=Root, Path=MensajeConfirmacion}" Margin="10,5,10,10"/>
+        </StackPanel>
+        <DockPanel LastChildFill="False" Grid.Row="1">
+            <Button x:Name="ButAceptar" Content="Aceptar" DockPanel.Dock="Left" Width="70" Height="25" Margin="30,0,10,0" IsDefault="True"
+                    Click="ButAceptar_Click"/>
+            <Button x:Name="ButCancelar" Content="Cancelar" DockPanel.Dock="Right" Width="70" Height="25" Margin="10,0,30,0" IsCancel="True"/>
+        </DockPanel>
+    </Grid>
+</Window>

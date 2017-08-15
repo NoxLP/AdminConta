@@ -331,28 +331,28 @@ namespace ModuloGestion.ObjModels
             if (Baja) throw new CustomException_ObjModels("La finca está dada de baja");
             this.PropietarioActual.CambioNombrePropietario(nombre);
         }
-        public bool DarDeBaja()
+        #endregion
+                
+        public int GetOwnerId()
         {
+            return this.IdOwnerComunidad;
+        }
+        #endregion
+
+        #region baja
+        public bool DarDeBaja(bool todoCerrado)
+        {
+            if (!todoCerrado) return false;
             if (Baja) return false;
             this._Baja = true;
             return true;
         }
-        public bool RecuperarBaja()
+        public bool RecuperarBaja(bool todoCerrado)
         {
+            if (!todoCerrado) return false;
             if (!Baja) return false;
             this._Baja = false;
             return true;
-        }
-
-        public bool TrySetCodigo(int codigo, ref List<int> codigos)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
-
-        public int GetOwnerId()
-        {
-            return this.IdOwnerComunidad;
         }
         #endregion
 

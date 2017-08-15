@@ -183,8 +183,12 @@ namespace QBuilder
             }
 
             private StringSQLBuilder _qBuilder;
-            
+
             #region get columns by type
+            public int GetColumnsCount(Type t)
+            {
+                return _Columns[t].Count();
+            }
             /// <summary>
             /// Without first and last commas.
             /// </summary>
@@ -438,66 +442,95 @@ namespace QBuilder
         #endregion
 
         #region SELECT 
-        public StringSQLBuilder AddSelect(Type t)
+        public StringSQLBuilder Select(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t);
             Query = $"SELECT {Columns} ";
             return this;
         }
-        public StringSQLBuilder AddSelect(Type t, string tableAlias)
+        public StringSQLBuilder Select(Type t, string tableAlias)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t, tableAlias);
             Query = $"SELECT {Columns} ";
             return this;
         }
-        public StringSQLBuilder AddSelect(Type t, string tableAlias, IEnumerable<string> columnsAlias)
+        public StringSQLBuilder Select(Type t, string tableAlias, string columnsAlias)
+        {
+            var cBuilder = new ColumnsBuilder(this);
+            string[] columnsAliasArray = new string[cBuilder.GetColumnsCount(t)];
+            for (int i = 0; i < cBuilder.GetColumnsCount(t); i++) columnsAliasArray[i] = columnsAlias;
+            cBuilder.GetAllColumns(t, tableAlias, columnsAliasArray);
+            Query = $"SELECT {Columns} ";
+            return this;
+        }
+        public StringSQLBuilder Select(Type t, string tableAlias, IEnumerable<string> columnsAlias)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t, tableAlias, columnsAlias);
             Query = $"SELECT {Columns} ";
             return this;
         }
-        public StringSQLBuilder AddSelect(IEnumerable<string> columns)
+        public StringSQLBuilder Select(IEnumerable<string> columns)
         {
             Query = $"SELECT {string.Join(",", columns)} ";
             return this;
         }
-        public StringSQLBuilder AddSelect(IEnumerable<string> columns, string tableAlias)
+        public StringSQLBuilder Select(IEnumerable<string> columns, string tableAlias)
         {
             var cBuilder = new StringBuilder();            
             Query = $"SELECT {cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias)} ";
             return this;
         }
-        public StringSQLBuilder AddSelect(IEnumerable<string> columns, string tableAlias, IEnumerable<string> columnsAlias)
+        public StringSQLBuilder Select(IEnumerable<string> columns, string tableAlias, IEnumerable<string> columnsAlias)
         {
             var cBuilder = new StringBuilder();
             Query = $"SELECT {cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias, columnsAlias)} ";
             return this;
         }
-        public StringSQLBuilder AddSelectColumns(Type t)
+        public StringSQLBuilder SelectColumns(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t);
             Query = Query.Append(",", Columns, " ");
             return this;
         }
-        public StringSQLBuilder AddSelectColumns(Type t, string tableAlias)
+        public StringSQLBuilder SelectColumns(Type t, string tableAlias)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t, tableAlias);
             Query = Query.Append(",", Columns, " ");
             return this;
         }
-        public StringSQLBuilder AddSelectColumns(Type t, string tableAlias, IEnumerable<string> columnsAlias)
+        public StringSQLBuilder SelectColumns(Type t, string tableAlias, string columnsAlias)
+        {
+            var cBuilder = new ColumnsBuilder(this);
+            string[] columnsAliasArray = new string[cBuilder.GetColumnsCount(t)];
+            for (int i = 0; i < cBuilder.GetColumnsCount(t); i++) columnsAliasArray[i] = columnsAlias;
+            cBuilder.GetAllColumns(t, tableAlias, columnsAliasArray);
+            Query = Query.Append(",", Columns, " ");
+            return this;
+        }
+        public StringSQLBuilder SelectColumns(Type t, string tableAlias, IEnumerable<string> columnsAlias)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t, tableAlias, columnsAlias);
             Query = Query.Append(",", Columns, " ");
             return this;
         }
-        public StringSQLBuilder AddSelectColumns(IEnumerable<string> columns, string tableAlias, IEnumerable<string> columnsAlias)
+        public StringSQLBuilder SelectColumns(IEnumerable<string> columns)
+        {
+            Query = Query.Append(",", $"{string.Join(",", columns)} ");
+            return this;
+        }
+        public StringSQLBuilder SelectColumns(IEnumerable<string> columns, string tableAlias)
+        {
+            var cBuilder = new StringBuilder();
+            Query = Query.Append(",", $"{cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias)} ");
+            return this;
+        }
+        public StringSQLBuilder SelectColumns(IEnumerable<string> columns, string tableAlias, IEnumerable<string> columnsAlias)
         {
             var cBuilder = new StringBuilder();
             Query = Query.Append(",", cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias, columnsAlias), " ");
@@ -506,7 +539,7 @@ namespace QBuilder
         #endregion
         #region INSERT
         //TODO: ¿INSERT mal?, se puede insertar en varias tablas, ejemplo: http://stackoverflow.com/questions/452859/inserting-multiple-rows-in-a-single-sql-query
-        public StringSQLBuilder AddInsertInto()
+        public StringSQLBuilder InsertInto()
         {
             Query = "INSERT INTO ";
             return this;
@@ -518,7 +551,7 @@ namespace QBuilder
         /// <param name="tableName"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertInto(string tableName, string tableAlias = "")
+        public StringSQLBuilder InsertInto(string tableName, string tableAlias = "")
         {
             Query = string.Concat("INSERT INTO ", tableName, " ", tableAlias, " ");
             return this;
@@ -531,7 +564,7 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertInto(Type t, string tableAlias = "")
+        public StringSQLBuilder InsertInto(Type t, string tableAlias = "")
         {
             Query = string.Concat("INSERT INTO ", t.Name, " ", tableAlias, " ");
             return this;
@@ -541,7 +574,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertFirstColumns(Type t)
+        public StringSQLBuilder InsertFirstColumns(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumnsWOId(t);
@@ -553,7 +586,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertFirstColumns(IEnumerable<string> columns)
+        public StringSQLBuilder InsertFirstColumns(IEnumerable<string> columns)
         {            
             Query = Query.Append("(", string.Join(",", columns));
             return this;
@@ -563,7 +596,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertFirstColumns(IEnumerable<string> columns, string tableAlias)
+        public StringSQLBuilder InsertFirstColumns(IEnumerable<string> columns, string tableAlias)
         {
             var cBuilder = new StringBuilder();
             Query = Query.Append("(", cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias));
@@ -574,7 +607,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertColumns(Type t)
+        public StringSQLBuilder InsertColumns(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumnsWOId(t);
@@ -586,7 +619,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="columns"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertColumns(IEnumerable<string> columns)
+        public StringSQLBuilder InsertColumns(IEnumerable<string> columns)
         {
             var cBuilder = new ColumnsBuilder(this);
             Query = Query.Append(string.Join(",", columns));
@@ -596,7 +629,7 @@ namespace QBuilder
         /// Only add "VALUES " + bracket.
         /// </summary>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertValues(string bracket = "")
+        public StringSQLBuilder InsertValues(string bracket = "")
         {
             Query = Query.Append("VALUES ", bracket);
             return this;
@@ -607,7 +640,7 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="paramSuffix"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertValues(Type t, string paramSuffix = "")
+        public StringSQLBuilder InsertValues(Type t, string paramSuffix = "")
         {
             var iBuilder = new InsertBuilder(this);
             Query = Query.Append(iBuilder.GetInsertValuesString(t, paramSuffix));
@@ -619,7 +652,7 @@ namespace QBuilder
         /// <param name="columns"></param>
         /// <param name="paramSuffix"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInsertValues(IEnumerable<string> columns, string paramSuffix = "")
+        public StringSQLBuilder InsertValues(IEnumerable<string> columns, string paramSuffix = "")
         {
             var iBuilder = new InsertBuilder(this);
             Query = Query.Append(iBuilder.GetInsertValuesString(columns, paramSuffix));
@@ -627,7 +660,7 @@ namespace QBuilder
         }
         #endregion
         #region UPDATE
-        public StringSQLBuilder AddUpdate(string tableName, string tableAlias = "")
+        public StringSQLBuilder Update(string tableName, string tableAlias = "")
         {
             Query = string.Concat("UPDATE ", tableName, " ", tableAlias, " ");
             return this;
@@ -639,12 +672,12 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddUpdate(Type t, string tableAlias = "")
+        public StringSQLBuilder Update(Type t, string tableAlias = "")
         {
             Query = string.Concat("UPDATE ", t.Name, " ", tableAlias, " ");
             return this;
         }
-        public StringSQLBuilder AddUpdateTable(string tableName, string tableAlias = "")
+        public StringSQLBuilder UpdateTable(string tableName, string tableAlias = "")
         {
             Query = Query.Append(",", tableName, " ", tableAlias, " ");
             return this;
@@ -656,12 +689,12 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddUpdateTable(Type t, string tableAlias = "")
+        public StringSQLBuilder UpdateTable(Type t, string tableAlias = "")
         {
             Query = Query.Append(",", t.Name, " ", tableAlias, " ");
             return this;
         }
-        public StringSQLBuilder AddUpdateSet(Type t, string paramSuffix = "")
+        public StringSQLBuilder UpdateSet(Type t, string paramSuffix = "")
         {
             var uBuilder = new UpdateBuilder();
             Query = Query.Append("SET ", uBuilder.GetUpdateSetString(t, paramSuffix), " ");
@@ -674,16 +707,16 @@ namespace QBuilder
         /// <param name="tableAlias"></param>
         /// <param name="paramSuffix"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddUpdateSet(Type t, string tableAlias, string paramSuffix)
+        public StringSQLBuilder UpdateSet(Type t, string tableAlias, string paramSuffix)
         {
             var uBuilder = new UpdateBuilder();
             Query = Query.Append("SET ", uBuilder.GetUpdateSetString(t, tableAlias, paramSuffix), " ");
             return this;
         }
-        public StringSQLBuilder AddUpdateSet(IEnumerable<string> columns,string paramSuffix = "")
+        public StringSQLBuilder UpdateWithoutSet(Type t, string tableAlias, string paramSuffix)
         {
             var uBuilder = new UpdateBuilder();
-            Query = Query.Append("SET ", uBuilder.GetUpdateSetString(columns, paramSuffix), " ");
+            Query = Query.Append(uBuilder.GetUpdateSetString(t, tableAlias, paramSuffix), " ");
             return this;
         }
         /// <summary>
@@ -693,10 +726,22 @@ namespace QBuilder
         /// <param name="tableAlias"></param>
         /// <param name="paramSuffix"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddUpdateSet(IEnumerable<string> columns, string tableAlias, string paramSuffix)
+        public StringSQLBuilder UpdateSet(IEnumerable<string> columns, string tableAlias, string paramSuffix)
         {
             var uBuilder = new UpdateBuilder();
             Query = Query.Append("SET ", uBuilder.GetUpdateSetString(columns, tableAlias, paramSuffix), " ");
+            return this;
+        }
+        public StringSQLBuilder UpdateSet(IEnumerable<string> columns, string paramSuffix = "")
+        {
+            var uBuilder = new UpdateBuilder();
+            Query = Query.Append("SET ", uBuilder.GetUpdateSetString(columns, paramSuffix), " ");
+            return this;
+        }
+        public StringSQLBuilder UpdateWithoutSet(IEnumerable<string> columns, string tableAlias, string paramSuffix)
+        {
+            var uBuilder = new UpdateBuilder();
+            Query = Query.Append(uBuilder.GetUpdateSetString(columns, tableAlias, paramSuffix), " ");
             return this;
         }
         #endregion
@@ -705,23 +750,23 @@ namespace QBuilder
         /// Only add "DELETE ".
         /// </summary>
         /// <returns></returns>
-        public StringSQLBuilder AddDelete()
+        public StringSQLBuilder Delete()
         {
             Query = "DELETE ";
             return this;
         }
-        public StringSQLBuilder AddDelete(IEnumerable<string> columns)
+        public StringSQLBuilder Delete(IEnumerable<string> columns)
         {
             Query = string.Concat("DELETE ", string.Join(",", columns), " ");
             return this;
         }
-        public StringSQLBuilder AddDelete(IEnumerable<string> columns, string tableAlias)
+        public StringSQLBuilder Delete(IEnumerable<string> columns, string tableAlias)
         {
             var cBuilder = new StringBuilder();
             Query = string.Concat("DELETE ", cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias), " ");
             return this;
         }
-        public StringSQLBuilder AddDeleteFrom(string tableName, string tableAlias = "")
+        public StringSQLBuilder DeleteFrom(string tableName, string tableAlias = "")
         {
             Query = Query.Append("DELETE FROM ", tableName, " ", tableAlias, " ");
             return this;
@@ -733,14 +778,14 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddDeleteFrom(Type t, string tableAlias = "")
+        public StringSQLBuilder DeleteFrom(Type t, string tableAlias = "")
         {
             Query = Query.Append("DELETE FROM ", t.Name, " ", tableAlias, " ");
             return this;
         }
         #endregion
         #region CLAUSES
-        public StringSQLBuilder AddFrom(string tableName, string alias = "")
+        public StringSQLBuilder From(string tableName, string alias = "")
         {
             Query = Query.Append("FROM ", tableName, " ", alias, " ");
             return this;
@@ -752,7 +797,7 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddFrom(Type t, string alias = "")
+        public StringSQLBuilder From(Type t, string alias = "")
         {
             Query = Query.Append("FROM ", t.Name, " ", alias, " ");
             return this;
@@ -763,7 +808,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="ownersIds"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddOwnersClauses(IEnumerable<int> ownersIds, string tableAlias = "")
+        public StringSQLBuilder OwnersClauses(IEnumerable<int> ownersIds, string tableAlias = "")
         {
             tableAlias = string.IsNullOrEmpty(tableAlias) ? "" : $"{tableAlias}.";
             int[] ids = ownersIds.ToArray();
@@ -774,23 +819,23 @@ namespace QBuilder
         /// Add only WHERE.
         /// </summary>
         /// <returns></returns>
-        public StringSQLBuilder AddWhere()
+        public StringSQLBuilder Where()
         {
             Query = Query.Append("WHERE ");
             return this;
         }
-        public StringSQLBuilder AddWhere(IEnumerable<SQLCondition> conditions)
+        public StringSQLBuilder Where(IEnumerable<SQLCondition> conditions)
         {
             Query = Query.Append("WHERE ");
             foreach(SQLCondition condition in conditions) Query = Query.Append(condition.ConditionString, " ");
             return this;
         }
-        public StringSQLBuilder AddWhere(SQLCondition condition)
+        public StringSQLBuilder Where(SQLCondition condition)
         {
             Query = Query.Append("WHERE ", condition.ConditionString, " ");
             return this;
         }
-        public StringSQLBuilder AddJoin(string typeOfJoin, string tableName, string alias = "")
+        public StringSQLBuilder Join(string typeOfJoin, string tableName, string alias = "")
         {
             Query = Query.Append(typeOfJoin, " JOIN ", tableName, " ", alias, " ");
             return this;
@@ -803,29 +848,29 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddJoin(string typeOfJoin, Type t, string alias = "")
+        public StringSQLBuilder Join(string typeOfJoin, Type t, string alias = "")
         {
             Query = Query.Append(typeOfJoin, " JOIN ", t.Name, " ", alias, " ");
             return this;
         }
-        public StringSQLBuilder AddOn(IEnumerable<SQLCondition> conditions)
+        public StringSQLBuilder On(IEnumerable<SQLCondition> conditions)
         {
             Query = Query.Append("ON ");
             foreach (SQLCondition condition in conditions) Query = Query.Append(condition.ConditionString);
             return this;
         }
-        public StringSQLBuilder AddOn(SQLCondition condition)
+        public StringSQLBuilder On(SQLCondition condition)
         {
             Query = Query.Append("ON ", condition.ConditionString);
             return this;
         }
-        public StringSQLBuilder AddOrderBy(IEnumerable<string> columns)
+        public StringSQLBuilder OrderBy(IEnumerable<string> columns)
         {
             var cBuilder = new StringBuilder();
             Query = Query.Append("ORDER BY ", string.Join(",", columns), " ");
             return this;
         }
-        public StringSQLBuilder AddOrderBy(IEnumerable<string> columns, string alias)
+        public StringSQLBuilder OrderBy(IEnumerable<string> columns, string alias)
         {
             var cBuilder = new StringBuilder();
             Query = Query.Append("ORDER BY ", cBuilder.ConcatAndAddCommasAndAlias(columns, alias), " ");
@@ -837,7 +882,7 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInColumns(Type t)
+        public StringSQLBuilder InColumns(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t);
@@ -850,7 +895,7 @@ namespace QBuilder
         /// <param name="t"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInColumns(Type t, string tableAlias)
+        public StringSQLBuilder InColumns(Type t, string tableAlias)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t, tableAlias);
@@ -863,7 +908,7 @@ namespace QBuilder
         /// <param name="columns"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInColumns(IEnumerable<string> columns)
+        public StringSQLBuilder InColumns(IEnumerable<string> columns)
         {
             Query = Query.Append("IN (", string.Join(",", columns));
             return this;
@@ -874,7 +919,7 @@ namespace QBuilder
         /// <param name="columns"></param>
         /// <param name="tableAlias"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInColumns(IEnumerable<string> columns, string tableAlias)
+        public StringSQLBuilder InColumns(IEnumerable<string> columns, string tableAlias)
         {
             var cBuilder = new StringBuilder();
             Query = Query.Append("IN (", cBuilder.ConcatAndAddCommasAndAlias(columns, tableAlias));
@@ -885,7 +930,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInParameters(Type t)
+        public StringSQLBuilder InParameters(Type t)
         {
             var cBuilder = new ColumnsBuilder(this);
             cBuilder.GetAllColumns(t);
@@ -899,7 +944,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="parametersNames"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddInParameters(IEnumerable<string> parametersNames)
+        public StringSQLBuilder InParameters(IEnumerable<string> parametersNames)
         {
             Query = Query.Append(
                 "IN (", 
@@ -913,7 +958,7 @@ namespace QBuilder
         /// <param name="firstSeparator"></param>
         /// <param name="condition"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddCondition(string firstSeparator, SQLCondition condition)
+        public StringSQLBuilder Condition(string firstSeparator, SQLCondition condition)
         {
             Query = Query.Append(firstSeparator, " ", condition.ConditionString);
 
@@ -925,7 +970,7 @@ namespace QBuilder
         /// </summary>
         /// <param name="conditions"></param>
         /// <returns></returns>
-        public StringSQLBuilder AddConditions(string firstSeparator, IEnumerable<SQLCondition> conditions)
+        public StringSQLBuilder Conditions(string firstSeparator, IEnumerable<SQLCondition> conditions)
         {
             Query = Query.Append(firstSeparator);
             foreach(SQLCondition condition in conditions)
@@ -945,12 +990,12 @@ namespace QBuilder
             Query = Query.Append(strings.ToArray());
             return this;
         }
-        public StringSQLBuilder AddTable(string tableName, string alias = "")
+        public StringSQLBuilder Table(string tableName, string alias = "")
         {
             Query = Query.Append(tableName, " ", alias, " ");
             return this;
         }
-        public StringSQLBuilder AddTable(Type t, string alias = "")
+        public StringSQLBuilder Table(Type t, string alias = "")
         {
             Query = Query.Append(t.Name, " ", alias, " ");
             return this;

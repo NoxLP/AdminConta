@@ -21,7 +21,7 @@
                                    Background="{StaticResource BackgroundExpandersColor}"/>
                 <AbleTabControl:AbleTabControl x:Name="AbleTabControl" Panel.ZIndex="{Binding ZIndex}"
                                        HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch" Height="Auto" Width="Auto"
-                                       ItemsSourceProperty="{Binding Tabs}"/>
+                                       ItemsSourceProperty="{Binding Tabs}" SelectedIndex="{Binding SelectedTab, Mode=OneWayToSource}"/>
             </DockPanel>
     </Grid>
 </Window>

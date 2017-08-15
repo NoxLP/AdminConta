@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using AdConta.Models;
-using ModuloContabilidad.ObjModels;
-using ModuloGestion.ObjModels;
-
-namespace Repository
+﻿namespace Repository
 {
-    public interface iAppRepositories
+    public interface IAppRepositories
     {
         #region general
         PersonaRepository PersonaRepo { get; }
         ComunidadRepository ComunidadRepo { get; }
+        EjercicioRepository EjercicioRepo { get; }
         #endregion
 
         #region contabilidad

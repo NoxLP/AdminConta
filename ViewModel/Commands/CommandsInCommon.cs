@@ -146,7 +146,7 @@ namespace AdConta.ViewModel
 
         public bool CanExecute(object parameter)
         {
-            return this._tab.ComMaxCod > this._tab.TabComCod;
+            return this._tab.ComMaxCod > this._tab.TabCodigoComunidad;
         }
 
         public event EventHandler CanExecuteChanged
@@ -157,7 +157,7 @@ namespace AdConta.ViewModel
 
         public void Execute(object parameter)
         {
-            this._tab.OnChangedCod(this._tab.TabComCod + 1);
+            this._tab.OnChangedComunidad(this._tab.TabCodigoComunidad + 1);
         }
     }
     /// <summary>
@@ -174,7 +174,7 @@ namespace AdConta.ViewModel
 
         public bool CanExecute(object parameter)
         {
-            return this._tab.ComMinCod < this._tab.TabComCod;
+            return this._tab.ComMinCod < this._tab.TabCodigoComunidad;
         }
 
         public event EventHandler CanExecuteChanged
@@ -185,7 +185,7 @@ namespace AdConta.ViewModel
 
         public void Execute(object parameter)
         {
-            this._tab.OnChangedCod(this._tab.TabComCod - 1);
+            this._tab.OnChangedComunidad(this._tab.TabCodigoComunidad - 1);
         }
     }
     /// <summary>

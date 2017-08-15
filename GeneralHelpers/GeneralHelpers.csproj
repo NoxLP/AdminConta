@@ -46,22 +46,32 @@
     <Compile Include="AppModelControlMessenger.cs" />
     <Compile Include="BORRAMEEventHandlerManager.cs" />
     <Compile Include="Date.cs" />
+    <Compile Include="Exceptions\CustomException_Mapper.cs" />
     <Compile Include="Exceptions\CustomException_AutoCodigo.cs" />
     <Compile Include="Exceptions\CustomException_DBWrapper.cs" />
-    <Compile Include="Exceptions\CustomException_Mapper.cs" />
     <Compile Include="Exceptions\CustomException_ObjModels.cs" />
     <Compile Include="Exceptions\CustomException_Repository.cs" />
+    <Compile Include="Extensions\DataTableExtension.cs" />
+    <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\DecimalExtensions.cs" />
     <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Enum\Enums.cs" />
     <Compile Include="Extensions\FramewElementExtensions.cs" />
+    <Compile Include="Extensions\HashSetExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtension.cs" />
     <Compile Include="Extensions\IntExtension.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Extensions\TaskExtension.cs" />
+    <Compile Include="Extensions\TypeExtension.cs" />
     <Compile Include="GeneralHelpers.cs" />
+    <Compile Include="NotifyTask\INotifyTask.cs" />
+    <Compile Include="NotifyTask\NotifyTask.cs" />
+    <Compile Include="NotifyTask\NotifyTaskTResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TriggerDebugger.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ErrorMessage\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

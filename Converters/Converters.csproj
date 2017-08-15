@@ -44,15 +44,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsientoDGridHeightConverter.cs" />
+    <Compile Include="BoolLogicalConverters.cs" />
     <Compile Include="BoolToX.cs" />
     <Compile Include="CaptionButtonRectToMarginConverter.cs" />
     <Compile Include="HeightToGridLengthConverter.cs" />
-    <Compile Include="StringFormatConverter.cs" />
+    <Compile Include="NotifyTaskCompletionErrorMessagesCollectionsJoinMultiConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RibbonActualWidthToRGroupWidthConverter.cs" />
+    <Compile Include="StringFormatConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GeneralHelpers\GeneralHelpers.csproj">
+      <Project>{419b406e-5a8b-4ebc-ac38-bcf9e5fee940}</Project>
+      <Name>GeneralHelpers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

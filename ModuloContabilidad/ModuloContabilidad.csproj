@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CustomChromeLibrary">
+      <HintPath>..\..\..\..\C#\WpfCustomChromeLib\Libraries\CustomChromeLibrary\bin\Release\CustomChromeLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="RibbonControlsLibrary, Version=4.0.0.11019, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -39,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -53,9 +57,16 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsientoDinamico\AsientoDinamico_ImporteValidationRule.cs" />
+    <Compile Include="Commands\Mayor\Command_Punteo.cs" />
+    <Compile Include="Commands\Mayor\Command_NewAsientoSimple.cs" />
+    <Compile Include="Commands\TabExp\Command_CerrarTabExpTabAsiento.cs" />
+    <Compile Include="Commands\TabExp\Command_GuardarAsiento-DeshacerCambios.cs" />
+    <Compile Include="Commands\TabExp\Command_MoveAsientoToWindow.cs" />
     <Compile Include="Models\Asientos\AsientosDBConnection.cs" />
     <Compile Include="Models\aMayor_DBConnectionBase.cs" />
     <Compile Include="Models\TabMayorDBConnection.cs" />
+    <Compile Include="ObjModelsHelpers\ApunteHelpers.cs" />
     <Compile Include="TabbedExpanderTabs\TabbedExpanderFiller_Diario.cs" />
     <Compile Include="TabbedExpanderTabs\TabbedExpanderFiller_Mayor.cs" />
     <Compile Include="TabbedExpanderTabs\TabExpTabBuscarUC.xaml.cs">
@@ -64,21 +75,22 @@
     <Compile Include="TabbedExpanderTabs\TabExpTabCuentaUC.xaml.cs">
       <DependentUpon>TabExpTabCuentaUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TabbedExpanderTabs\TabExpTabDiarioUC.xaml.cs">
-      <DependentUpon>TabExpTabDiarioUC.xaml</DependentUpon>
+    <Compile Include="TabbedExpanderTabs\TabExpTabVistaDiarioUC.xaml.cs">
+      <DependentUpon>TabExpTabVistaDiarioUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="TabDiarioUC.xaml.cs">
       <DependentUpon>TabDiarioUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TabbedExpanderTabs\TabExpTabAsientoSimpleUC.xaml.cs">
-      <DependentUpon>TabExpTabAsientoSimpleUC.xaml</DependentUpon>
+    <Compile Include="TabbedExpanderTabs\TabExpInferiorTabAsientoUC.xaml.cs">
+      <DependentUpon>TabExpInferiorTabAsientoUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="AsientosWindow.xaml.cs">
       <DependentUpon>AsientosWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TemplateSelectors.cs" />
-    <Compile Include="TabbedExpanderTabs\VMTabbedExpDiario.cs" />
-    <Compile Include="ViewModel\VMAsientoSimple.cs" />
+    <Compile Include="ContabilidadTemplateSelectors.cs" />
+    <Compile Include="TabbedExpanderTabs\TabExpTabVistaDiarioVM.cs" />
+    <Compile Include="TabbedExpanderTabs\TabExpTabAsientoVM.cs" />
+    <Compile Include="ViewModel\IVMConAsientoRepo.cs" />
     <Compile Include="ViewModel\VMTabDiario.cs" />
     <Compile Include="ViewModel\VMTabMayor.cs" />
     <Resource Include="Resources\ContabilidadRD.xaml">
@@ -97,7 +109,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TabbedExpanderTabs\TabExpTabDiarioUC.xaml">
+    <Page Include="TabbedExpanderTabs\TabExpTabVistaDiarioUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -116,7 +128,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TabbedExpanderTabs\TabExpTabAsientoSimpleUC.xaml">
+    <Page Include="TabbedExpanderTabs\TabExpInferiorTabAsientoUC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -152,10 +164,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\C#\WpfCustomChromeLib\Libraries\CustomChromeLibrary\CustomChromeLibrary.csproj">
-      <Project>{25990f61-a27b-4edf-a402-b31bf952153f}</Project>
-      <Name>CustomChromeLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Converters\Converters.csproj">
       <Project>{1d039e54-9b3d-4ae3-af95-cd26d759497a}</Project>
       <Name>Converters</Name>
@@ -176,9 +184,17 @@
       <Project>{941a90cb-1636-48bb-9a7b-bc560ea30ba9}</Project>
       <Name>Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ModuloGeneral\ModuloGeneral.csproj">
+      <Project>{21481137-3ade-4e27-9dbd-423d2ae8fde8}</Project>
+      <Name>ModuloGeneral</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ObjModels_Contabilidad\ObjModels_Contabilidad.csproj">
       <Project>{d4ac8b21-1ffc-4b13-ad1c-ca3d7cb5c497}</Project>
       <Name>ObjModels_Contabilidad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_General\ObjModels_General.csproj">
+      <Project>{61439b7d-d7e7-4d24-89ad-3c7c44948c28}</Project>
+      <Name>ObjModels_General</Name>
     </ProjectReference>
     <ProjectReference Include="..\Repository\Repository.csproj">
       <Project>{441f08bb-c1e9-484a-8ecb-f661004bf47f}</Project>
@@ -200,6 +216,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

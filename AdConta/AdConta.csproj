@@ -58,7 +58,15 @@
       <HintPath>..\packages\EPPlus.4.1.0\lib\net40\EPPlus.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=10.4.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\TaskScheduler.2.5.28\lib\net452\JetBrains.Annotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Win32.TaskScheduler, Version=2.5.28.0, Culture=neutral, PublicKeyToken=0d013ddd5178a2ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\TaskScheduler.2.5.28\lib\net452\Microsoft.Win32.TaskScheduler.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Windows.Shell, Version=3.5.41019.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -81,6 +89,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppUserControls\CargandoUC.xaml.cs">
+      <DependentUpon>CargandoUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AppUserControls\FalloAlCargarUC.xaml.cs">
+      <DependentUpon>FalloAlCargarUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Login\Login.xaml.cs">
+      <DependentUpon>Login.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Login\VMLogin.cs" />
     <Compile Include="ModelControl\-MC-ComunidadContabilidad.cs" />
     <Compile Include="ModelControl\-MG-ComunidadGestion.cs" />
     <Compile Include="ModelControl\AppModelControl.cs" />
@@ -89,7 +107,10 @@
     <Compile Include="AppUserControls\TabCdadUC.xaml.cs">
       <DependentUpon>TabCdadUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AppUserControls\VMTabCdad.cs" />
+    <Compile Include="SideTool\SideToolEjercicioItem.cs" />
+    <Compile Include="SideTool\SideToolTabItem.cs" />
+    <Compile Include="SideTool\VMSideTool.cs" />
+    <Compile Include="VMTabCdad.cs" />
     <Compile Include="DBTest.xaml.cs">
       <DependentUpon>DBTest.xaml</DependentUpon>
     </Compile>
@@ -101,6 +122,18 @@
     <Compile Include="TabbedExpanderTabs\TabbedExpanderFiller_Cdad.cs" />
     <Compile Include="TemplateSelectors.cs" />
     <Compile Include="VMMain.cs" />
+    <Page Include="AppUserControls\CargandoUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppUserControls\FalloAlCargarUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Login\Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DBTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -179,10 +212,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\C#\WpfCustomChromeLib\Libraries\CustomChromeLibrary\CustomChromeLibrary.csproj">
-      <Project>{25990f61-a27b-4edf-a402-b31bf952153f}</Project>
-      <Name>CustomChromeLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Converters\Converters.csproj">
       <Project>{1d039e54-9b3d-4ae3-af95-cd26d759497a}</Project>
       <Name>Converters</Name>
@@ -207,6 +236,10 @@
       <Project>{4bf923ef-6e9a-4781-9bc1-e0a00d0330c7}</Project>
       <Name>ModuloContabilidad</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ModuloGeneral\ModuloGeneral.csproj">
+      <Project>{21481137-3ade-4e27-9dbd-423d2ae8fde8}</Project>
+      <Name>ModuloGeneral</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ModuloGestion\ModuloGestion.csproj">
       <Project>{7055d918-5f2b-44ff-9b5c-8072eaf71a4b}</Project>
       <Name>ModuloGestion</Name>
@@ -214,6 +247,10 @@
     <ProjectReference Include="..\ObjModels_Contabilidad\ObjModels_Contabilidad.csproj">
       <Project>{d4ac8b21-1ffc-4b13-ad1c-ca3d7cb5c497}</Project>
       <Name>ObjModels_Contabilidad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_General\ObjModels_General.csproj">
+      <Project>{61439b7d-d7e7-4d24-89ad-3c7c44948c28}</Project>
+      <Name>ObjModels_General</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObjModels_Gestion\ObjModels_Gestion.csproj">
       <Project>{6086eaa3-02ee-4e05-a9a9-3362488be42a}</Project>
@@ -250,15 +287,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\forum-pin-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="conta1.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="conta1_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>conta1.mdf</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -169,17 +169,6 @@ namespace GlobalSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=e:\\AdConta\\AdConta\\AdConta\\co" +
-            "nta1.mdf;Integrated Security=True")]
-        public string conta1ConnectionString {
-            get {
-                return ((string)(this["conta1ConnectionString"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ORDER BY Codigo")]
         public string ORDERCDADES {
             get {
@@ -196,6 +185,38 @@ namespace GlobalSettings.Properties {
             }
             set {
                 this["NOMBRECUENTADEFAULT"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=e:\\AdConta\\AdConta\\AdConta\\co" +
+            "nta1.mdf;Integrated Security=True")]
+        public string conta1ConnectionString {
+            get {
+                return ((string)(this["conta1ConnectionString"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ULTIMACUENTAMAYOR {
+            get {
+                return ((string)(this["ULTIMACUENTAMAYOR"]));
+            }
+            set {
+                this["ULTIMACUENTAMAYOR"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("AdminConta")]
+        public string NOMBREAPPINTERNO {
+            get {
+                return ((string)(this["NOMBREAPPINTERNO"]));
             }
         }
     }

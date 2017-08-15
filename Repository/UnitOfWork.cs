@@ -23,15 +23,15 @@ namespace Repository
 
         Task<bool> CommitAsync(bool storeResults);
         Task RollbackAsync();
-        Task RemoveVMTabReferencesFromRepos();
+        Task RemoveVMTabReferencesFromReposAsync();
     }
 
     public class UnitOfWork : iUnitOfWork
     {
-        public UnitOfWork(IEnumerable<IRepository> repositories, aVMTabBase tab, bool rollbackAllIfRollback = false)
+        public UnitOfWork(IEnumerable<aRepositoryInternal> repositories, aVMTabBase tab, bool rollbackAllIfRollback = false)
         {
             this.RollbackAllIfRollback = rollbackAllIfRollback;
-            this.Repositories = (HashSet<IRepositoryInternal>)repositories.Select(x=>(IRepositoryInternal)x);
+            this.Repositories = new HashSet<aRepositoryInternal>(repositories);
             this._Tab = tab;
             InitRepositories();
         }
@@ -44,7 +44,7 @@ namespace Repository
         #endregion
 
         #region properties
-        internal HashSet<IRepositoryInternal> Repositories { get; private set; }
+        internal HashSet<aRepositoryInternal> Repositories { get; private set; }
         public bool RollbackAllIfRollback { get; set; }
         public ConditionsToCommitSQL ConditionsToCommit { get { return this._ConditionsToCommit; } }
         public IEnumerable<dynamic> LastResults { get; private set; }
@@ -76,7 +76,7 @@ namespace Repository
 
         #region public methods
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task RemoveVMTabReferencesFromRepos() { Parallel.ForEach(this.Repositories, repo => repo.RemoveVMTabReferences(this._Tab)); }
+        public async Task RemoveVMTabReferencesFromReposAsync() { Parallel.ForEach(this.Repositories, repo => repo.RemoveVMTabReferencesAsync(this._Tab)); }
 
         public async Task RollbackAsync()
         {

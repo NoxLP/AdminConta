@@ -28,7 +28,7 @@ namespace ModuloContabilidad
         #region overriden methods
         protected override void FillTopTabExp()
         {
-            base.Tabs = new List<TabExpTabItemBaseVM>(base.numberOfTabs);
+            base.Tabs = new List<TabExpTabItemBaseVM>(base.NumberOfTabs);
             base.Tabs.Add(new TabExpTabItemBaseVM()
             {
                 Expandible = true,
@@ -58,7 +58,7 @@ namespace ModuloContabilidad
         {
             base.Tabs.Clear();
             base.Tabs = new List<TabExpTabItemBaseVM>();
-            base.Tabs.Add(new VMTabbedExpDiario()
+            base.Tabs.Add(new TabExpTabVistaDiarioVM()
             {
                 Expandible = true,
                 ParentVM = TabExpContainer,

@@ -10,7 +10,7 @@
              mc:Ignorable="d"
              d:DesignHeight="350" d:DesignWidth="350">
     <UserControl.Resources>
-        <local:CommItem x:Key="CommItem"/>
+        <local:SideToolTabItem x:Key="SideToolItem"/>
     </UserControl.Resources>
     <Grid>
         <Expander x:Name="Expander" ExpandDirection="Left" IsExpanded="{Binding ElementName=Root, Path=ExIsExpanded, Mode=TwoWay}"
@@ -23,6 +23,24 @@
                 </TextBlock>
             </Expander.Header>
             <Grid>
+                <TreeView x:Name="TreeViewEjercicios" HorizontalAlignment="Left" VerticalAlignment="Top" Width="auto" Margin="3" Padding="0,0,10,0"
+                          BorderThickness="0" BorderBrush="Transparent">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True"/>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type local:SideToolEjercicioItem}" ItemsSource="{Binding Hierarchy}">
+                            <Button Content="{Binding Path=ItemHeader}" Command="{Binding ButtonClick}" IsEnabled="True"
+                                               HorizontalAlignment="Left" VerticalAlignment="Center" Width="Auto" Height="Auto"
+                                               Margin="0" Padding="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent"/>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
                 <TreeView x:Name="TreeView" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="auto" Margin="3" Padding="0,0,10,0"
                           ItemsSource="{Binding ElementName=Root, Path=ItemsSourceProperty}" BorderThickness="0" BorderBrush="Transparent">
                     <TreeView.ItemContainerStyle>
@@ -35,7 +53,7 @@
                         </Style>
                     </TreeView.ItemContainerStyle>
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type local:CommItem}" ItemsSource="{Binding Hierarchy}">
+                        <HierarchicalDataTemplate DataType="{x:Type local:SideToolTabItem}" ItemsSource="{Binding Hierarchy}">
                             <Button Content="{Binding Path=ItemHeader}" Command="{Binding ButtonClick}" IsEnabled="True"
                                                HorizontalAlignment="Left" VerticalAlignment="Center" Width="Auto" Height="Auto"
                                                Margin="0" Padding="0" BorderBrush="Transparent" BorderThickness="0" Background="Transparent"/>

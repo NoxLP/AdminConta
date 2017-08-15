@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="GlobalSettings.Properties" GeneratedClassName="ContabilidadSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MENSAJESERROR_ASIENTO_ERRORALGUARDARASIENTO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">¿Desea cancelar el asiento (el asiento se borrará y perderá toda la información) o volver a la ventana sin guardar el asiento?</Value>
+    </Setting>
+    <Setting Name="MENSAJESCONFIRMACION_ASIENTO_CONFIRMACIONCERRARASIENTOSINGUARDAR" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">El asiento no se ha guardado, si cierra esta pestaña perderá los cambios que haya realizado hasta ahora. ¿Quiere cerrar esta pestaña de todas formas?</Value>
+    </Setting>
+    <Setting Name="MENSAJESCONFIRMACION_ASIENTO_CONFIRMACIONSIMPLEACOMPLEJO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Parece que no está haciendo un Asiento Simple. ¿Desea completar el asiento en la vista de Asiento Complejo?</Value>
+    </Setting>
+    <Setting Name="MENSAJESERROR_ASIENTO_LETRASENCELDAIMPORTE" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Aquí debe introducir un importe numérico, no puede escribir letras o símbolos salvo coma (,) o punto (.) para separar los decimales.</Value>
+    </Setting>
+    <Setting Name="MENSAJESERROR_ASIENTO_ASIENTOCERRADO" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Este asiento no se puede modificar por que la contabilidad está cerrada.</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

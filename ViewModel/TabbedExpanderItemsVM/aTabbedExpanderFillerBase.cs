@@ -18,14 +18,14 @@ namespace AdConta.ViewModel
     {
         public aTabbedExpanderFillerBase(
             T container, 
-            int numberTabs, 
+            int numberOfTabs, 
             ref TabbedExpander topTE, 
             ref TabbedExpander bottomTE, 
             ref RowDefinition rowDef,
             bool fill)
         {
             this._TabExpContainer = container;
-            this._numberOfTabs = numberTabs;
+            this._NumberOfTabs = numberOfTabs;
 
             if (fill)
             {
@@ -38,7 +38,7 @@ namespace AdConta.ViewModel
         #region fields
         private aTabsWithTabExpVM _TabExpContainer;
         private List<TabExpTabItemBaseVM> _Tabs;
-        private int _numberOfTabs;
+        private int _NumberOfTabs;
         #endregion
 
         #region properties
@@ -52,10 +52,10 @@ namespace AdConta.ViewModel
             get { return this._Tabs; }
             set { this._Tabs = value; }
         }
-        protected int numberOfTabs
+        protected int NumberOfTabs
         {
-            get { return this._numberOfTabs; }
-            set { this._numberOfTabs = value; }
+            get { return this._NumberOfTabs; }
+            set { this._NumberOfTabs = value; }
         }
         #endregion
 

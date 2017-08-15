@@ -8,80 +8,44 @@ using AdConta.ViewModel;
 using QBuilder;
 using ModuloContabilidad.ObjModels;
 using Mapper;
+using Extensions;
+using System.Data.SqlClient;
+using Dapper;
+using AdConta;
+using System.Threading;
 
 namespace Repository
 {
-    public sealed class AsientoRepository : aRepositoryBase, IRepository
+    public sealed class AsientoRepository : aRepositoryBaseWithTwoOwners<Asiento>, IRepositoryCRUD<Asiento>, IRepositoryDependent<CuentaMayor>, IDisposable
     {
         public AsientoRepository()
         {
             MapperStore store = new MapperStore();
             this._Mapper = (DapperMapper<Asiento>)store.GetMapper(GetObjModelType());
+            this.Transactions = new ConcurrentDictionary<aVMTabBase, List<Tuple<QueryBuilder, IConditionToCommit>>>();
         }
-
-        #region fields
-        private ConcurrentDictionary<aVMTabBase, HashSet<Asiento>> _NewObjects = new ConcurrentDictionary<aVMTabBase, HashSet<Asiento>>();
-        private ConcurrentDictionary<int, Asiento> _ObjModels = new ConcurrentDictionary<int, Asiento>();
-        private ConcurrentDictionary<int, Asiento> _OriginalObjModels = new ConcurrentDictionary<int, Asiento>();
-        private ConcurrentDictionary<aVMTabBase, HashSet<Asiento>> _ObjectsRemoved = new ConcurrentDictionary<aVMTabBase, HashSet<Asiento>>();
-        private DapperMapper<Asiento> _Mapper;
-        #endregion
-
-        #region properties
-        public ConcurrentDictionary<aVMTabBase, List<Tuple<QueryBuilder, IConditionToCommit>>> Transactions { get; private set; }
-        #endregion
 
         #region helpers
-        public override Type GetObjModelType()
+        internal override async Task ApplyChangesAsync(aVMTabBase VM, Func<Task> doFirstInsideSemaphoreWaiting = null, Func<Task> doLastInsideSemaphoreWaiting = null)
         {
-            return typeof(Asiento);
-        }
-        public void NewVM(aVMTabBase VM)
-        {
-            base._RepoSphr.Wait();
-            if (!this.Transactions.ContainsKey(VM)) this.Transactions.TryAdd(VM, new List<Tuple<QueryBuilder, IConditionToCommit>>());
-            if (!this._NewObjects.ContainsKey(VM)) this._NewObjects.TryAdd(VM, new HashSet<Asiento>());
-            if (!this._ObjectsRemoved.ContainsKey(VM)) this._ObjectsRemoved.TryAdd(VM, new HashSet<Asiento>());
-            if (!base._DirtyMembers.ContainsKey(VM)) base._DirtyMembers.TryAdd(VM, new Dictionary<int, string[]>());
-            base._RepoSphr.Release();
-        }
-        public void RemoveVMTabReferences(aVMTabBase VM)
-        {
-            HashSet<Asiento> setDump;
-            List<Tuple<QueryBuilder, IConditionToCommit>> lDump;
-            Dictionary<int, string[]> dDump;
+            int[] VMIdsToAdd = base._DirtyMembers[VM].Keys.ToArray(); //To delete dependent later
+            int[] VMIdsToRemove = this._ObjectsRemoved[VM].Select(x => x.Id).ToArray();
 
-            base._RepoSphr.Wait();
-            this._NewObjects.TryRemove(VM, out setDump);
-            this.Transactions.TryRemove(VM, out lDump);
-            this._ObjectsRemoved.TryRemove(VM, out setDump);
-            base._DirtyMembers.TryRemove(VM, out dDump);
-            base._RepoSphr.Release();
+            await base.ApplyChangesAsync(VM);
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            ((IRepositoryDependent<CuentaMayor>)this).ApplyDependentAsync(VMIdsToAdd, VMIdsToRemove).Forget().ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
-        public async Task ApplyChangesAsync(aVMTabBase VM)
+        internal override async Task RollbackRepoAsync(aVMTabBase VM, Func<Task> doFirstInsideSemaphoreWaiting = null, Func<Task> doLastInsideSemaphoreWaiting = null)
         {
-            await base._RepoSphr.WaitAsync();
-            foreach (Asiento obj in this._NewObjects[VM]) _ObjModels.TryAdd(obj.Id, obj); //All old new objects are now normal objects
-            this._NewObjects[VM].Clear(); //Therefore, clear new objects
-            this.Transactions[VM].Clear(); //Transactions made, clear transactions
-            this._ObjectsRemoved[VM].Clear(); //Apply deletes
-            base._DirtyMembers[VM].Clear(); //Clear objects members modified
-            base._RepoSphr.Release();
-        }
-        public async Task RollbackRepoAsync(aVMTabBase VM)
-        {
-            await base._RepoSphr.WaitAsync();
+            IEnumerable<int> VMIds = base._DirtyMembers[VM].Keys.Union(this._NewObjects[VM].Select(x => x.Id)).AsEnumerable(); //To delete dependent later
 
-            foreach (KeyValuePair<int, string[]> kvp in base._DirtyMembers[VM])
-                this._ObjModels[kvp.Key] = this._OriginalObjModels[kvp.Key]; //Change back al objects to their original state
-            //¡¡¡¡OJO!!!! This above only changes dictionary reference, if VM or others had a reference to the object, it will not GCollected AND
-            //the owner/s will maintain the reference to the bad, modified, "not-rollbacked" object.
+            await base.RollbackRepoAsync(VM);
 
-            this._NewObjects[VM].Clear(); //Clear new objects
-            this.Transactions[VM].Clear(); //Transactions made, clear transactions
-            base._DirtyMembers[VM].Clear(); //Clear objects members modified
-
-            base._RepoSphr.Release();
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            ((IRepositoryDependent<CuentaMayor>)this).RollbackDependentAsync(VMIds).Forget().ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
         #endregion
 
@@ -92,9 +56,72 @@ namespace Repository
         }
         protected override QueryBuilder GetUpdateSQL(int id, aVMTabBase VM)
         {
-            throw new NotImplementedException();
+            if (base._NewObjects[VM].Select(asiento => asiento.Id).Contains(id) || //If the object have been newly created it needs an INSERT not an UPDATE
+                !base._DirtyMembers[VM].ContainsKey(id)) //If there are no dirty members the object haven't been modified
+                return null;
+
+            Type t = GetObjModelType();
+            QueryBuilder qBuilder = new QueryBuilder();
+            if (!base._DirtyMembers[VM][id].Contains("Apuntes"))
+            {
+                qBuilder
+                    .Update(t)
+                    .UpdateSet(this._DirtyMembers[VM][id])
+                    .Where(new SQLCondition("Id", "@id"));
+                qBuilder.StoreParametersFrom(this._ObjModels[id]);
+                qBuilder.StoreParameter("id", id);
+            }
+            else
+            {
+                Type tApunte = typeof(Apunte);
+                qBuilder
+                    .Update(t)
+                    .UpdateSet(this._DirtyMembers[VM][id])
+                    .Where(new SQLCondition("Id", "@id"))
+                    .SemiColon()
+                    .Append(Environment.NewLine);
+                qBuilder.StoreParametersFrom(this._ObjModels[id]);
+                qBuilder.StoreParameter("id", id);
+
+                if (base._ObjModels[id].Apuntes.Count > 20)
+                {
+                    SemaphoreSlim sphr = new SemaphoreSlim(1);
+                    int n = 0;
+                    Parallel.ForEach(base._ObjModels[id].Apuntes.Where(apunte => apunte.DirtyMembers.Count > 0), apunte =>
+                    {
+                        sphr.Wait();
+                        int i = n++;
+                        sphr.Release();
+                        qBuilder
+                            .Update(tApunte)
+                            .UpdateSet(apunte.DirtyMembers)
+                            .Where(new SQLCondition("Id", $"@apuid{i}"))
+                            .SemiColon()
+                            .Append(Environment.NewLine);
+                        qBuilder.StoreParametersFrom(apunte, apunte.DirtyMembers, i.ToString());
+                        qBuilder.StoreParameter($"apuid{i}", apunte.Id);
+                    });
+                }
+                else
+                {
+                    int i = 0;
+                    foreach(Apunte apunte in this._ObjModels[id].Apuntes.Where(apunte => apunte.DirtyMembers.Count > 0))
+                    {
+                        qBuilder
+                            .Update(tApunte)
+                            .UpdateSet(apunte.DirtyMembers)
+                            .Where(new SQLCondition("Id", $"@apuid{i}"))
+                            .SemiColon()
+                            .Append(Environment.NewLine);
+                        qBuilder.StoreParametersFrom(apunte, apunte.DirtyMembers, i.ToString());
+                        qBuilder.StoreParameter($"apuid{i}", apunte.Id);
+                        i++;
+                    }
+                }
+            }
+            return qBuilder;
         }
-        private QueryBuilder GetInsertSQL(Asiento cuenta)
+        private QueryBuilder GetInsertSQL(Asiento asiento)
         {
             throw new NotImplementedException();
         }
@@ -105,21 +132,250 @@ namespace Repository
         #endregion
 
         #region public methods
-        public async Task<Asiento> GetById(int id)
+        public Asiento AsientoMapperGetFromDictionary(int id)
+        {
+            Asiento asiento;
+            if (!base._ObjModels.TryGetValue(id, out asiento)) return null;
+
+            return asiento;
+        }
+        public async Task<Asiento> GetByIdAsync(int id, aVMTabBase VM)
         {
             throw new NotImplementedException();
         }
-        public async Task<bool> AddNew(Asiento AsientoObj, aVMTabBase VM)
+        public async Task<bool> AddNewAsync(Asiento AsientoObj, aVMTabBase VM)
         {
             throw new NotImplementedException();
         }
-        public async Task<bool> Update(Asiento AsientoObj, aVMTabBase VM)
+        public async Task<bool> UpdateAsync(Asiento AsientoObj, aVMTabBase VM)
+        {
+            QueryBuilder SQL = await Task.Run(() => GetUpdateSQL(AsientoObj.Id, VM)).ConfigureAwait(false);
+            if (SQL == null) return false;
+
+            ConditionToCommitScalar<int> condition = new ConditionToCommitScalar<int>(ConditionTCType.equal, 
+                SQL.CountNumberOfOcurrencesInQuery("UPDATE"));
+            var tuple = new Tuple<QueryBuilder, IConditionToCommit>(SQL, condition);
+
+            return await AddTransactionWaitingForCommitAsync(tuple, VM);
+        }
+        public async Task<bool> RemoveAsync(Asiento AsientoObj, aVMTabBase VM)
         {
             throw new NotImplementedException();
         }
-        public async Task<bool> Remove(Asiento AsientoObj, aVMTabBase VM)
+        #endregion
+
+        #region dependent CuentaMayor
+        private ConcurrentDictionary<CuentaMayor, List<int>> _CuentaDependenciesDict;
+        ConcurrentDictionary<CuentaMayor, List<int>> IRepositoryDependent<CuentaMayor>.DependenciesDict => _CuentaDependenciesDict;
+
+        QueryBuilder IRepositoryDependent<CuentaMayor>.GetAllDependentByMasterSelectSQL(int dependentIdCodigo)
         {
-            throw new NotImplementedException();
+            Type t = GetObjModelType();
+            Type apunte = typeof(Apunte);
+            Type cuenta = typeof(CuentaMayor);
+            QueryBuilder qBuilder = new QueryBuilder();
+            var ownerConditions = GetCurrentOwnersCondition(tableAlias: "cuenta");
+            var joinApunteCuentaCondition = new SQLCondition("Id", "cuenta", "IdCuenta", "apu");
+            var joinApunteCondition = new SQLCondition("Asiento", "apu", "Id", "asi");
+            var owners = new string[2] { "IdOwnerComunidad", "IdOwnerEjercicio" };
+            //SELECT asi.asiasiento, apu.apuapunte, cuenta.owners FROM asiento asi 
+            //INNER JOIN apunte apu ON apu.Asiento = asi.Id -> joinApuntecondition
+            //INNER JOIN cuentamayor cuenta ON cuenta.Id = apu.IdCuenta -> joinApunteCuentacondition
+            //WHERE cuenta.IdOwnerComunidad = @idCdad AND cuenta.IdOwnerEjercicio = @idEjer AND apu.IdCuenta = @codCuenta;
+            qBuilder
+                .Select(t, "asi", "asi")
+                .SelectColumns(apunte, "apu", "apu")
+                .SelectColumns(owners, "cuenta")
+                .From(t, "asi")
+                .Join("INNER", apunte, "apu")
+                .On(joinApunteCondition)
+                .Join("INNER", cuenta, "cuenta")
+                .On(joinApunteCuentaCondition)
+                .Where(ownerConditions)
+                .Condition("AND", new SQLCondition("IdCuenta", "apu", "@codCuenta", ""))
+                .OrderBy(new string[1] { "Fecha" }, "asi")
+                .OrderBy(new string[1] { "OrdenEnAsiento" }, "apu")
+                .SemiColon();
+            base.StoreCurrentOwnerConditionsParameters(qBuilder);
+            qBuilder.StoreParameter("codCuenta", dependentIdCodigo);
+
+            return qBuilder;
+        }
+        QueryBuilder IRepositoryDependent<CuentaMayor>.GetIdsDependentByMasterSelectSQL(int dependentIdCodigo)
+        {
+            Type t = GetObjModelType();
+            Type apunte = typeof(Apunte);
+            Type cuenta = typeof(CuentaMayor);
+            QueryBuilder qBuilder = new QueryBuilder();
+            var ownerConditions = GetCurrentOwnersCondition(tableAlias: "cuenta");
+            var joinApunteCuentaCondition = new SQLCondition("Id", "cuenta", "IdCuenta", "apu");
+            var joinApunteCondition = new SQLCondition("Asiento", "apu", "Id", "asi");
+            var owners = new string[2] { "IdOwnerComunidad", "IdOwnerEjercicio" };
+            //SELECT asi.Id FROM asiento asi 
+            //INNER JOIN apunte apu ON apu.Asiento = asi.Id -> joinApuntecondition
+            //INNER JOIN cuentamayor cuenta ON cuenta.Id = apu.IdCuenta -> joinApunteCuentacondition
+            //WHERE cuenta.IdOwnerComunidad = @idCdad AND cuenta.IdOwnerEjercicio = @idEjer AND apu.IdCuenta = @codCuenta;
+            qBuilder
+                .Select(new string[] { "Id" }, "asi")
+                .From(t, "asi")
+                .Join("INNER", apunte, "apu")
+                .On(joinApunteCondition)
+                .Join("INNER", cuenta, "cuenta")
+                .On(joinApunteCuentaCondition)
+                .Where(ownerConditions)
+                .Condition("AND", new SQLCondition("IdCuenta", "apu", "@codCuenta", ""))
+                .SemiColon();
+            base.StoreCurrentOwnerConditionsParameters(qBuilder);
+            qBuilder.StoreParameter("codCuenta", dependentIdCodigo);
+
+            return qBuilder;
+        }
+        QueryBuilder IRepositoryDependent<CuentaMayor>.GetDependentByMasterSelectSQL(int dependentIdCodigo, IEnumerable<int> ids)
+        {
+            Type t = GetObjModelType();
+            Type apunte = typeof(Apunte);
+            QueryBuilder qBuilder = new QueryBuilder();
+            var joinApunteCondition = new SQLCondition("Asiento", "apu", "Id", "asi");
+            IEnumerable<string> inParams = ids
+                .Select(x =>
+                    x.ToString().PutAhead("inP"));
+            //SELECT asi.asiento, apu.apunte FROM asiento asi 
+            //INNER JOIN apunte apu ON apu.Asiento = asi.Id -> joinApuntecondition
+            //WHERE asi.Id IN(ids)
+            qBuilder
+                .Select(t, "asi")
+                .SelectColumns(apunte, "apu")
+                .Join("INNER", apunte, "apu")
+                .On(joinApunteCondition)
+                .Where(new SQLCondition("Id", "asi", inParams))
+                .OrderBy(new string[1] { "Fecha" }, "asi")
+                .OrderBy(new string[1] { "OrdenEnAsiento" }, "apu")
+                .SemiColon();
+            qBuilder.StoreParameters((IEnumerable<object>)ids, "inP");
+
+            return qBuilder;
+        }
+        async Task IRepositoryDependent<CuentaMayor>.RollbackDependentAsync(IEnumerable<int> ids)
+        {
+            await base._RepoSphr.WaitAsync();
+            Parallel.ForEach(this._CuentaDependenciesDict, kvp =>
+            //foreach(KeyValuePair<CuentaMayor,List<int>> kvp in this._CuentaDependenciesDict)
+            {
+                var coincidences = kvp.Value.Intersect(ids);
+
+                if (coincidences.Count() > 0)
+                {
+                    if (coincidences.Count() == kvp.Value.Count)
+                    {
+                        List<int> dump;
+                        this._CuentaDependenciesDict.TryRemove(kvp.Key, out dump);
+                    }
+                    else this._CuentaDependenciesDict[kvp.Key] = kvp.Value.Except(coincidences).ToList();
+                }
+            });
+            base._RepoSphr.Release();
+        }
+        async Task IRepositoryDependent<CuentaMayor>.ApplyDependentAsync(IEnumerable<int> idsToAdd, IEnumerable<int> idsToRemove)
+        {
+            await base._RepoSphr.WaitAsync();
+            Parallel.ForEach(this._CuentaDependenciesDict, kvp =>
+            {
+                IEnumerable<int> toAddToThisCuenta = idsToAdd
+                    .Where(id => this._ObjModels[id].Apuntes
+                        .Any(apunte => apunte.Cuenta.Equals(kvp.Key))); //Those who share the same CuentaMayor
+                    //.Except(kvp.Value); //Remove those that are already in the dictionary => not necessary, Union is Distinct
+                IEnumerable<int> toRemoveFromThisCuenta = idsToRemove
+                    .Where(id => this._ObjModels[id].Apuntes
+                        .Any(apunte => apunte.Cuenta.Equals(kvp.Key))) //Those who share the same CuentaMayor
+                    .Intersect(kvp.Value); //Those who exists currently in the dictionary
+
+                if (toAddToThisCuenta.Count() > 0)
+                    this._CuentaDependenciesDict[kvp.Key] = this._CuentaDependenciesDict[kvp.Key].Union(toAddToThisCuenta).ToList();
+
+                if (toRemoveFromThisCuenta.Count() > 0)
+                {
+                    if (toRemoveFromThisCuenta.Count() == kvp.Value.Count)
+                    {
+                        List<int> dump;
+                        this._CuentaDependenciesDict.TryRemove(kvp.Key, out dump);
+                    }
+                    else this._CuentaDependenciesDict[kvp.Key] = kvp.Value.Except(toRemoveFromThisCuenta).ToList();
+                }
+            });
+            base._RepoSphr.Release();
+        }
+        
+        public async Task<List<Asiento>> GetTodosAsientosCuentaAsync(CuentaMayor cuenta)
+        {
+            await base._RepoSphr.WaitAsync();
+            base.CurrentCdadOwner = cuenta.IdOwnerComunidad;
+            base.CurrentEjerOwner = cuenta.IdOwnerEjercicio;
+
+            IEnumerable<int> ids;
+            using (SqlConnection con = new SqlConnection(this._strCon))
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                QueryBuilder qBuilder = ((IRepositoryDependent<CuentaMayor>)this).GetIdsDependentByMasterSelectSQL(cuenta.Id);
+
+                ids = await con.QueryAsync<int>(qBuilder.Query, qBuilder.Parameters).ConfigureAwait(false);
+
+                con.Close();
+            }
+
+            //Remove currently existent objects
+            if (this._CuentaDependenciesDict.ContainsKey(cuenta))
+            {
+                //Más asientos podrían haberse añadido a la misma cuenta
+                bool idsAreTheSameThanThoseInDictionary = ids
+                    .OrderBy(x => x)
+                    .SequenceEqual(
+                        this._CuentaDependenciesDict[cuenta]
+                        .OrderBy(x => x));
+                //Si no se han añadido más asientos, devuelve los que están ya en el diccionario
+                if (idsAreTheSameThanThoseInDictionary)
+                {
+                    base._RepoSphr.Release();
+                    return this._ObjModels
+                        .Where(kvp => ids.Contains(kvp.Key))
+                        .Select(kvp => kvp.Value)
+                        .ToList();
+                }
+                //De otra manera coge solo los asientos nuevos que NO están en el diccionario
+                ids = ids.Except(this._CuentaDependenciesDict[cuenta]);
+            }            
+
+            IEnumerable<dynamic> result;
+            using (SqlConnection con = new SqlConnection(this._strCon))
+            {
+                await con.OpenAsync().ConfigureAwait(false);
+                QueryBuilder qBuilder = ((IRepositoryDependent<CuentaMayor>)this).GetDependentByMasterSelectSQL(cuenta.Id, ids);
+
+                result = await con.QueryAsync(qBuilder.Query, qBuilder.Parameters).ConfigureAwait(false);
+
+                con.Close();
+            }
+
+            List<Asiento> final = await Task.Run(() => this._Mapper.Map<List<Asiento>>(result)).ConfigureAwait(false);
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+            Task.Run(async () =>
+            {
+                if (!this._CuentaDependenciesDict.ContainsKey(cuenta)) this._CuentaDependenciesDict.TryAdd(cuenta, ids.ToList());
+                else this._CuentaDependenciesDict[cuenta] = this._CuentaDependenciesDict[cuenta].Union(ids).ToList();
+
+                foreach (Asiento asi in final) this._OriginalObjModels.TryAdd(asi.Id, asi);
+
+                List<Asiento> copy = this._Mapper.Map<List<Asiento>>(result);
+                foreach (Asiento asi in copy) this._ObjModels.TryAdd(asi.Id, asi);
+            })
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+            .Forget().ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+            base._RepoSphr.Release();
+
+            return final;
         }
         #endregion
 

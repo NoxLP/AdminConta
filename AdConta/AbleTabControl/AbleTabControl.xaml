@@ -122,7 +122,7 @@
                                     <GridSplitter Grid.Row="2" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows" Margin="3,2,3,4"
                                           IsEnabled="{Binding ElementName=BottomTabbedExpander, Path=IsExpanded, Mode=OneWay}" 
                                           Visibility="{Binding ElementName=BottomTabbedExpander, Path=IsExpanded, Mode=OneWay,
-                                      Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=TESplitter}"
+                                      Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=FalseCollapsed}"
                                           HorizontalAlignment="Stretch" 
                                           Width="Auto" 
                                           Height="{Binding ElementName=BottomTabbedExpander, Path=IsExpanded, Mode=OneWay,
@@ -131,7 +131,12 @@
                                           Background="{StaticResource SplitterGradient}"/>
                                     <!--BorderBrush="{StaticResource SplitterGradient}" BorderThickness="1"/>-->
                                     <Grid Grid.Row="3" Background="{StaticResource BackgroundAppColor}" x:Name="MayorRootGridRow3" Margin="0">
-                                        <TabbedExpander:TabbedExpander x:Name="BottomTabbedExpander" 
+                                        <DockPanel LastChildFill="True">
+                                            <!--*****Binds en code-behind*****-->
+                                            <main:CargandoUC x:Name="UCCargando" HorizontalAlignment="Right" VerticalAlignment="Bottom" DockPanel.Dock="Right"/>
+                                            <main:FalloAlCargarUC x:Name="UCFalloAlCargar" HorizontalAlignment="Right" VerticalAlignment="Bottom" DockPanel.Dock="Right"/>
+                                            <!--******************************-->
+                                            <TabbedExpander:TabbedExpander x:Name="BottomTabbedExpander" DockPanel.Dock="Left"
                                            TabStripPlacement="Bottom" 
                                            VerticalAlignment="Stretch"
                                            MaxHeight="400"
@@ -145,6 +150,7 @@
                                            EXPANDER_EXPANDED_HEIGHT="NaN"
                                            BorderBrush="{StaticResource TabControlNormalBorderBrush}" BorderThickness="0.5"
                                            ContentTemplateSelector="{StaticResource TabbedExpTemplateSelector}"/>
+                                        </DockPanel>
                                     </Grid>
                                 </Grid>
                                 <ControlTemplate.Triggers>

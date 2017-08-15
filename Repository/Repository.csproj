@@ -53,15 +53,24 @@
     <Compile Include="Repositories\AsientoRepository.cs" />
     <Compile Include="Repositories\ComunidadRepository.cs" />
     <Compile Include="Repositories\CuentaMayorRepository.cs" />
+    <Compile Include="Repositories\EjercicioRepository.cs" />
+    <Compile Include="RepositoryBase\aRepositoryBaseWithOwners.cs" />
+    <Compile Include="RepositoryBase\aRepositoryInternal.cs" />
+    <Compile Include="RepositoryBase\aRepositoryInternalWithDLO.cs" />
+    <Compile Include="RepositoryBase\IRepositoryCRUD.cs" />
+    <Compile Include="RepositoryBase\IRepositoryDependent.cs" />
     <Compile Include="Repositories\PropietarioRepository.cs" />
     <Compile Include="RepositoryBase\aRepositoryBase.cs" />
     <Compile Include="RepositoryBase\ConditionsToCommitSQL.cs" />
-    <Compile Include="RepositoryBase\iRepository.cs" />
     <Compile Include="ObjModels\GrupoGasto.cs" />
     <Compile Include="ObjModels\Presupuesto.cs" />
     <Compile Include="RepositoryBase\iAppRepositories.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\PersonaRepository.cs" />
+    <Compile Include="RepositoryBase\IRepositoryDLO.cs" />
+    <Compile Include="RepositoryBase\IRepositoryInternal-BORRAME.cs" />
+    <Compile Include="RepositoryBase\IRepository.cs" />
+    <Compile Include="RepositoryBase\IRepositoryOwner.cs" />
     <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +89,10 @@
     <ProjectReference Include="..\ObjModels_Contabilidad\ObjModels_Contabilidad.csproj">
       <Project>{d4ac8b21-1ffc-4b13-ad1c-ca3d7cb5c497}</Project>
       <Name>ObjModels_Contabilidad</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_General\ObjModels_General.csproj">
+      <Project>{61439b7d-d7e7-4d24-89ad-3c7c44948c28}</Project>
+      <Name>ObjModels_General</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObjModels_Gestion\ObjModels_Gestion.csproj">
       <Project>{6086eaa3-02ee-4e05-a9a9-3362488be42a}</Project>

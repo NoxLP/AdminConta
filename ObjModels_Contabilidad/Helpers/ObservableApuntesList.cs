@@ -11,11 +11,11 @@ namespace ModuloContabilidad.ObjModels
 {
     public class ObservableApuntesList : ObservableCollection<Apunte>
     {
-        public ObservableApuntesList(Asiento asiento)
+        public ObservableApuntesList(IAsiento asiento)
         {
             this._Asiento = asiento;
         }
-        public ObservableApuntesList(Asiento asiento, IEnumerable<Apunte> apuntes)
+        public ObservableApuntesList(IAsiento asiento, IEnumerable<Apunte> apuntes)
         {
             this._Asiento = asiento;
 
@@ -25,7 +25,7 @@ namespace ModuloContabilidad.ObjModels
         }
 
         #region fields
-        private Asiento _Asiento;
+        private IAsiento _Asiento;
         #endregion
 
         #region properties
@@ -46,7 +46,7 @@ namespace ModuloContabilidad.ObjModels
         }
         #endregion
 
-        #region public methods
+        #region override
         protected override void InsertItem(int index, Apunte item)
         {
             if (!_Asiento.Abierto) return;
@@ -79,7 +79,7 @@ namespace ModuloContabilidad.ObjModels
         }
         #endregion
     }
-
+    
     //public class ApuntesList : aProtectedList<Apunte>
     //{
     //    #region properties

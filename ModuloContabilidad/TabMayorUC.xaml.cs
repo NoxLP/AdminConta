@@ -38,14 +38,14 @@ namespace ModuloContabilidad
         #endregion
 
         #region helpers
-        private void DefineDGridColumns(ref DataGridCheckBoxColumn pricipalCol, ref DataGridTextColumn statusCol)
+        private void DefineDGridColumns(ref DataGridCheckBoxColumn principalCol, ref DataGridTextColumn statusCol)
         {
-            pricipalCol.Header = "Punteo";
-            pricipalCol.Width = this.TabDGridPrincipal.Columns.First(x => (string)x.Header == "Debe").ActualWidth;//new DataGridLength(widthPercent, DataGridLengthUnitType.Star);
-            pricipalCol.MinWidth = 35.0;
-            pricipalCol.Binding = new Binding("Punteo") { Source = (this.DataContext as VMTabMayor).DView };
-            pricipalCol.HeaderStyle = Application.Current.Resources["DGridHeaderStyle"] as Style;
-            pricipalCol.ElementStyle = Application.Current.Resources["DGridCenterCheckBCellStyle"] as Style;
+            principalCol.Header = "Punteo";
+            principalCol.Width = this.TabDGridPrincipal.Columns.First(x => (string)x.Header == "Debe").ActualWidth;//new DataGridLength(widthPercent, DataGridLengthUnitType.Star);
+            principalCol.MinWidth = 35.0;
+            principalCol.Binding = new Binding("Punteo") { Source = (this.DataContext as VMTabMayor).Apuntes };
+            principalCol.HeaderStyle = Application.Current.Resources["DGridHeaderStyle"] as Style;
+            principalCol.ElementStyle = Application.Current.Resources["DGridCenterCheckBCellStyle"] as Style;
 
             statusCol.Header = "Saldo Punteado";
             statusCol.Width = this.TabDGridStatus.Columns.First(x => (string)x.Header == "Debe").ActualWidth;//new DataGridLength(widthPercent, DataGridLengthUnitType.Star);
@@ -94,6 +94,8 @@ namespace ModuloContabilidad
                     this.TabDGridPrincipal.Columns.Remove(col);
                     this.TabDGridStatus.Columns.Remove(statusCol);
                 }
+
+                ((VMTabMayor)this.DataContext).PublicNotifyPropChanged("StatusGridSaldoPunteado");
             }
         }
         #endregion
@@ -118,7 +120,9 @@ namespace ModuloContabilidad
         /// <param name="e"></param>
         private void TabButPunt_Click(object sender, RoutedEventArgs e)
         {
-            //TODO HAY QUE GUARDAR EL PUNTEO EN LA BASE DE DATOS
+
+            //TODO: HAY QUE PASAR ESTO AL VIEWMODEL
+
             if (this.TabDGridPrincipal.Columns.Count == this._TabDGridPrincipalInitColumnsCount + 1)
             {
                 DataGridCheckBoxColumn col = new DataGridCheckBoxColumn();
@@ -156,6 +160,12 @@ namespace ModuloContabilidad
                     this.TabDGridStatus.Columns.Remove(statusCol);
                 }
             }
+        }
+
+        private void MayorDGridCell_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ((VMTabMayor)this.DataContext).MayorDGridCell_MouseLeftButtonUp(sender, e);
+            e.Handled = true;
         }
         #endregion
     }

@@ -1,0 +1,29 @@
+﻿<Window x:Class="AdConta.Login.Login"
+        x:Name="LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AdConta.Login"
+        xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
+        mc:Ignorable="d"
+        Title="Login" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight">
+    <Window.DataContext>
+        <local:VMLogin/>
+    </Window.DataContext>
+    <WrapPanel Orientation="Vertical" Height="Auto" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <TextBlock Text="Login:" Margin="10"/>
+        <DockPanel Margin="10,5,10,5">
+            <UserControls:TBoxLabel x:Name="TBLLoginUsuario" TBReadOnly="False" Label="Usuario" TBWidth="150" LabelPosition="Left" Margin="0,0,0,3" DockPanel.Dock="Top" HorizontalAlignment="Right"/>
+            <UserControls:TBoxLabel x:Name="TBLLoginContraseña" TBReadOnly="False" Text="" Label="Contraseña" TBWidth="150" LabelPosition="Left" Margin="0,0,0,3" DockPanel.Dock="Bottom" HorizontalAlignment="Right"/>
+        </DockPanel>        
+        <DockPanel HorizontalAlignment="Stretch" LastChildFill="False" Margin="10">
+            <Button x:Name="ButLoginNuevoUsuario" Content="Nuevo usuario" Margin="0,10,15,10" DockPanel.Dock="Left"/>
+            <DockPanel DockPanel.Dock="Right" Margin="10,0,0,0" LastChildFill="False">
+                <Button x:Name="ButLoginAceptar" Content="Aceptar" Margin="5,10,5,10" DockPanel.Dock="Left" 
+                        Command="{Binding AceptarLogin}" CommandParameter="{Binding ElementName=LoginWindow}"/>
+                <Button x:Name="ButLoginCancelar" Content="Cancelar" Margin="5,10,5,10" DockPanel.Dock="Right" IsCancel="True" Click="ButLoginCancelar_Click"/>
+            </DockPanel>
+        </DockPanel>
+    </WrapPanel>
+</Window>

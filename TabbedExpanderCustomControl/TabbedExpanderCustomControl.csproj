@@ -48,7 +48,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VM\TabExpTabItem.cs" />
+    <Compile Include="VM\TabExpTabItemBaseVM.cs" />
     <Compile Include="VM\iTabbedExpanderItemVM.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:ribbon="http://schemas.microsoft.com/winfx/2006/xaml/presentation/ribbon"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:TabbedExpander="clr-namespace:TabbedExpanderCustomControl;assembly=TabbedExpanderCustomControl"
              xmlns:UserControls="clr-namespace:AdConta.UserControls;assembly=AdConta.UserControls"
              xmlns:local="clr-namespace:ModuloContabilidad"
@@ -23,7 +23,8 @@
             <!--Formato euros: StringFormat={}{0:C}-->
             <DataGrid x:Name="TabDGridStatus" HeadersVisibility="None" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" 
                           IsReadOnly="True" Margin="0,0,0,2" RowHeaderWidth="0" AutoGenerateColumns="False"
-                          SelectionMode="Single" SelectionUnit="Cell" CanUserAddRows="False" ItemsSource="{Binding StatusGridSource, Mode=OneWay}"
+                          SelectionMode="Single" SelectionUnit="Cell" CanUserAddRows="False" CanUserReorderColumns="False"
+                          ItemsSource="{Binding StatusGridSource, Mode=OneWay}"
                           HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray" GridLinesVisibility="Vertical"
                           Background="{StaticResource MayorDGridBackground}"
                           Height="{Binding ElementName=TabDGridStatus, Path=RowHeight, Mode=OneWay}">
@@ -56,13 +57,14 @@
                          HorizontalAlignment="Stretch" TextAlignment="Center"/>-->
             <DataGrid x:Name="TabDGridPrincipal" DockPanel.Dock="Bottom" RowHeaderWidth="0" 
                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"
-                          IsReadOnly="True" Margin="0,2,0,0" ItemsSource="{Binding DView, Mode=OneWay}" AutoGenerateColumns="False" 
-                          SelectionMode="Single" SelectionUnit="Cell" CanUserAddRows="False"
-                          HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray"
+                          IsReadOnly="True" Margin="0,2,0,0" ItemsSource="{Binding Apuntes, Mode=OneWay}"  
+                          SelectionMode="Single" SelectionUnit="Cell" SelectedItem="{Binding MayorDGridSelectedItem}"
+                          CanUserAddRows="False" CanUserReorderColumns="False" AutoGenerateColumns="False"
+                          HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" 
                           Background="{StaticResource MayorDGridBackground}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="N.As." Binding="{Binding NAsiento}" Width="45" MinWidth="30"  
-                                            HeaderStyle="{StaticResource DGridHeaderStyle}"
+                                            HeaderStyle="{StaticResource DGridHeaderStyle}" 
                                             ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
                     <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat=\{0:dd/MM/yyyy\}}" Width="75" MinWidth="75" 
                                             HeaderStyle="{StaticResource DGridHeaderStyle}"
@@ -70,13 +72,13 @@
                     <DataGridTextColumn Header="Concepto" Binding="{Binding Concepto}" Width="6*" MinWidth="100" 
                                             HeaderStyle="{StaticResource DGridHeaderStyle}"
                                             ElementStyle="{StaticResource DGridLeftCellStyle}" d:IsHidden="True"/>
-                    <DataGridTextColumn Header="Debe" Binding="{Binding Debe, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                    <DataGridTextColumn Header="Debe" Binding="{Binding ImporteAlDebe, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
                                             HeaderStyle="{StaticResource DGridHeaderStyle}"
                                             ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
-                    <DataGridTextColumn Header="Haber" Binding="{Binding Haber, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                    <DataGridTextColumn Header="Haber" Binding="{Binding ImporteAlHaber, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
                                             HeaderStyle="{StaticResource DGridHeaderStyle}"
                                             ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
-                    <DataGridTextColumn Header="Saldo" Binding="{Binding Saldo, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
+                    <DataGridTextColumn Header="Saldo" Binding="{Binding SaldoEnCuenta, StringFormat=N2}" Width="1*" MinWidth="55" MaxWidth="75" 
                                             HeaderStyle="{StaticResource DGridHeaderStyle}"
                                             ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
                     <DataGridHyperlinkColumn Header="Recibo" Binding="{Binding Recibo}" Width="0.3*" 
@@ -86,6 +88,16 @@
                                                  HeaderStyle="{StaticResource DGridLeftHeaderStyle}"
                                                  ElementStyle="{StaticResource DGridRightCellStyle}" d:IsHidden="True"/>
                 </DataGrid.Columns>
+                
+                <!--<DataGrid.Resources>                    
+                    <Style x:Name="MayorDGridRowStyle" TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <Trigger 
+                            <EventTrigger RoutedEvent="MouseLeftButtonUp" 
+                        </Style.Triggers>
+                        <EventSetter Event="MouseLeftButtonUp" Handler="MayorDGridCell_MouseLeftButtonUp"/>
+                    </Style>
+                </DataGrid.Resources>-->
             </DataGrid>
             <!--Height="{Binding DataGridHeight}"-->
         </DockPanel>

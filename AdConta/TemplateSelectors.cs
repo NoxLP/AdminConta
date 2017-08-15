@@ -20,7 +20,7 @@ namespace AdConta
             App Application = App.Current as App;
             aVMTabBase tab = item as aVMTabBase;
 
-            switch (tab.Type)
+            switch (tab.TabType)
             {
                 case TabType.Mayor:
                     return (DataTemplate)Application.Resources["TabMayor"];

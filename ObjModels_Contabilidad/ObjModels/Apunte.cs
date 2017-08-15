@@ -1,17 +1,41 @@
 ﻿using AdConta;
 using AdConta.Models;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace ModuloContabilidad.ObjModels
 {
-    public class Apunte : IObjModelBase, IOwnerComunidad, IObjWithDLO<ApunteDLO>
+    public class Apunte : IObjModelBase, IOwnerComunidad, IObjWithDLO<ApunteDLO>, ICanBeModifiedDirectlyFromView
     {
-        public Apunte() { }
+        public Apunte()
+        {
+            InitModifiedProperties();
+        }
         public Apunte(int id, int idComunidad, Asiento asiento, string FacturaId = null)
         {
             this._Id = id;
             this._IdOwnerComunidad = idComunidad;
             this._Asiento = asiento;
             this._Factura = FacturaId;
+
+            InitModifiedProperties();
+        }
+        public Apunte(int id, int idComunidad, Asiento asiento, string FacturaId, int ordenEnAsiento, DebitCredit debeHaber, decimal importe,
+            string concepto, CuentaMayor cuenta, bool punteo)
+        {
+            this._Id = id;
+            this._IdOwnerComunidad = idComunidad;
+            this._Asiento = asiento;
+            this._Factura = FacturaId;
+            this._OrdenEnAsiento = ordenEnAsiento;
+            this._DebeHaber = debeHaber;
+            this._Importe = importe;
+            this.Concepto = concepto;
+            this.Cuenta = cuenta;
+            this.Punteo = punteo;
+
+            InitModifiedProperties();
         }
 
         #region fields
@@ -21,29 +45,68 @@ namespace ModuloContabilidad.ObjModels
         private int _OrdenEnAsiento;
 #pragma warning restore CS0649
         private Asiento _Asiento;
+        private string _Concepto;
         private DebitCredit _DebeHaber;
         private decimal _Importe;
+        private CuentaMayor _Cuenta;
+        private bool _Punteo;
         private string _Factura;
         #endregion
-
+        
         #region properties
         public int Id { get { return this._Id; } }        
         public int IdOwnerComunidad { get { return this._IdOwnerComunidad; } }
-        public int OrdenEnAsiento { get { return this._OrdenEnAsiento; } }
+        public int OrdenEnAsiento
+        {
+            get { return this._OrdenEnAsiento; }
+            set
+            {
+                if(this._OrdenEnAsiento != value)
+                {
+                    if (!this._Asiento.Abierto)
+                        throw new CustomException_ObjModels(
+                            $"Error cambiando el orden del apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+                    
+                    this._Asiento.Apuntes.Move(this.OrdenEnAsiento, value);
+                    this._OrdenEnAsiento = value;
+
+                    PropertyModified("OrdenEnAsiento");
+                }
+            }
+        }
         public Asiento Asiento { get { return this._Asiento; } }
-        public string Concepto { get; set; }        
+        public string Concepto
+        {
+            get { return this._Concepto; }
+            set
+            {
+                if(this._Concepto != value)
+                {
+                    if (!this._Asiento.Abierto)
+                        throw new CustomException_ObjModels(
+                            $"Error cambiando el concepto del apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+                    
+                    this._Concepto = value;
+
+                    PropertyModified(Concepto);
+                }
+            }
+        }
         public DebitCredit DebeHaber
         {
             get { return this._DebeHaber; }
             set
             {
                 if (this._DebeHaber != value)
-                {                    
-                    if(!_Asiento.Abierto)
+                {
+                    if(!this._Asiento.Abierto)
                         throw new CustomException_ObjModels(
                             $"Error cambiando DebeHaber de apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+                    
                     this._Asiento.CambiaSaldo(this, value);
                     this._DebeHaber = value;
+
+                    PropertyModified("DebeHaber");
                 }
             }
         }        
@@ -54,17 +117,152 @@ namespace ModuloContabilidad.ObjModels
             {
                 if (this._Importe != value)
                 {
-                    if (!_Asiento.Abierto)
+                    if (!this._Asiento.Abierto)
                         throw new CustomException_ObjModels(
-                            $"Error cambiando DebeHaber de apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+                            $"Error cambiando Importe de apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+                    
                     this._Asiento.CambiaSaldo(this, value);
                     this._Importe = value;
+
+                    PropertyModified("Importe");
                 }
             }
         }
-        public CuentaMayor Cuenta { get; set; }
-        public bool Punteo { get; set; }        
-        public string Factura { get { return this._Factura; } }
+        public decimal ImporteAlDebe
+        {
+            get { return this.DebeHaber == DebitCredit.Debit ? this.Importe : 0; }
+        }
+        public decimal ImporteAlHaber
+        {
+            get { return this.DebeHaber == DebitCredit.Credit ? this.Importe : 0; }
+        }
+
+        public CuentaMayor Cuenta
+        {
+            get { return this._Cuenta; }
+            set
+            {
+                if (this._Cuenta != value)
+                {
+                    if (!this._Asiento.Abierto)
+                        throw new CustomException_ObjModels(
+                            $"Error cambiando la cuenta del apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+
+                    this._Cuenta = value;
+
+                    PropertyModified("Cuenta");
+                }
+            }
+        }
+        public bool Punteo
+        {
+            get { return this._Punteo; }
+            set
+            {
+                if (this._Punteo != value)
+                {
+                    if (!this._Asiento.Abierto)
+                        throw new CustomException_ObjModels(
+                            $"Error cambiando el punteo del apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+
+                    this._Punteo = value;
+
+                    PropertyModified("Punteo");
+                }
+            }
+        }
+        public string Factura
+        {
+            get { return this._Factura; }
+            set
+            {
+                if(this._Factura != value)
+                {
+                    if (!this._Asiento.Abierto)
+                        throw new CustomException_ObjModels(
+                            $"Error cambiando la factura del apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+
+                    this._Factura = value;
+
+                    PropertyModified("Factura");
+                }
+            }
+        }
+
+        #region ICanBeModifiedDirectlyFromView
+        public bool IsBeingModifiedFromView { get; set; }
+        public bool HasBeenModifiedFromView { get; set; }
+        public List<string> DirtyMembers { get; private set; }
+        #endregion
+
+        #endregion
+
+        #region public methods
+        public void InitModifiedProperties()
+        {
+            this.HasBeenModifiedFromView = false;
+            this.IsBeingModifiedFromView = false;
+            this.DirtyMembers = new List<string>();
+        }
+        public void PropertyModified(string propertyName)
+        {
+            if (this.IsBeingModifiedFromView)
+            {
+                this.DirtyMembers.Add(propertyName);
+                this.HasBeenModifiedFromView = true;
+            }
+        }
+        public void CambiaImporteAl(DebitCredit debeHaber, decimal nuevoImporte)
+        {
+            if (debeHaber == DebitCredit.Debit)
+            {
+                if (!this._Asiento.Abierto)
+                    throw new CustomException_ObjModels(
+                        $"Error cambiando Importe de apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+
+                if (this.DebeHaber != DebitCredit.Debit)
+                {
+                    this._Asiento.CambiaSaldo(this, nuevoImporte, DebitCredit.Debit);
+
+                    this._DebeHaber = DebitCredit.Debit;
+                    if (this.IsBeingModifiedFromView)
+                        this.DirtyMembers.Add("DebeHaber");
+                }
+                else
+                    this._Asiento.CambiaSaldo(this, nuevoImporte);
+
+                this._Importe = nuevoImporte;
+                if (this.IsBeingModifiedFromView)
+                {
+                    this.DirtyMembers.Add("Importe");
+                    this.HasBeenModifiedFromView = true;
+                }
+            }
+            else
+            {
+                if (!this._Asiento.Abierto)
+                    throw new CustomException_ObjModels(
+                        $"Error cambiando Importe de apunte numero {Id} de asiento numero {Asiento.Id}. Asiento cerrado.");
+
+                if (this.DebeHaber != DebitCredit.Credit)
+                {
+                    this._Asiento.CambiaSaldo(this, nuevoImporte, DebitCredit.Credit);
+
+                    this._DebeHaber = DebitCredit.Credit;
+                    if (this.IsBeingModifiedFromView)
+                        this.DirtyMembers.Add("DebeHaber");
+                }
+                else
+                    this._Asiento.CambiaSaldo(this, nuevoImporte);
+
+                this._Importe = nuevoImporte;
+                if (this.IsBeingModifiedFromView)
+                {
+                    this.DirtyMembers.Add("Importe");
+                    this.HasBeenModifiedFromView = true;
+                }
+            }
+        }
         #endregion
 
         #region DLO
@@ -114,7 +312,6 @@ namespace ModuloContabilidad.ObjModels
         public bool Punteo { get; private set; }
         public string Factura { get; private set; }
     }
-
 
     #region old
     //public class Apunte : iObjModelBase, iOwnerComunidad

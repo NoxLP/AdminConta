@@ -10,7 +10,7 @@
     <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" Margin="0">
         <UserControls:TBoxLabel x:Name="TabTBCuenta" HorizontalAlignment="Left" Margin="3,3,0,2"
                                                     Height="Auto" TBWidth="80" Label="Cuenta" TBFontSize="15"
-                                                    Text="{Binding ParentVM.AccountCod, Mode=OneWay}" TBTextAlignment="Right" TBReadOnly="False"
+                                                    Text="{Binding ParentVM.TopTE_CodigoCuenta, Mode=OneWay}" TBTextAlignment="Right" TBReadOnly="False"
                                                     EnterKeyBinding="{Binding ParentVM.NextRecord}"/>
         <Button x:Name="TabButNext" Content="->" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,17,8,0" Height="30" Width="30"
                                                     DockPanel.Dock="Right" Command=""/>
@@ -18,7 +18,7 @@
                                                     DockPanel.Dock="Right" Command=""/>
         <UserControls:TBoxLabel x:Name="TabTBNombre" HorizontalAlignment="Stretch" Margin="5,3,9,2" 
                                                     Height="Auto" Width="Auto" TBWidth="NaN" Label="Nombre" TBFontSize="15" Padding="0"
-                                                    Text="{Binding ParentVM.Nombre, Mode=TwoWay}" TBTextAlignment="Left" TBReadOnly="True"
+                                                    Text="{Binding ParentVM.TopTE_NombreCuenta, Mode=TwoWay}" TBTextAlignment="Left" TBReadOnly="True"
                                                         DockPanel.Dock="Left"/>
     </DockPanel>
 </UserControl>

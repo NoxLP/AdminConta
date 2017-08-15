@@ -34,8 +34,10 @@ namespace AdConta.AbleTabControl
             ItemsSourceProperty = new ObservableCollection<aVMTabBase>();
             this._NavigateSelectedTab = new Command_NavigateSelectedTab(this);
 
+            //Task.Run(() => SetInitializeTaskBindingAsync());
             this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, (Action)(() =>
-            { 
+            {
+                SetInitializeTaskBinding();
                 Grid BTEGrid = this.RootTabControl.FindVisualChild<Grid>(x => (x as Grid).Name == "TabControlGrid");
                 RowDefinition rowDef = BTEGrid.RowDefinitions[3];
                 TabbedExpander BTE = this.RootTabControl.FindVisualChild<TabbedExpander>(x => (x as FrameworkElement).Name == "BottomTabbedExpander");
@@ -77,8 +79,10 @@ namespace AdConta.AbleTabControl
         #endregion
 
         #region dependency properties
-        public static readonly DependencyProperty ItemsSourcePropertyProperty = DependencyProperty.Register("ItemsSourceProperty",
-            typeof(ObservableCollection<aVMTabBase>), typeof(AbleTabControl),
+        public static readonly DependencyProperty ItemsSourcePropertyProperty = DependencyProperty.Register(
+            "ItemsSourceProperty",
+            typeof(ObservableCollection<aVMTabBase>), 
+            typeof(AbleTabControl),
             new PropertyMetadata(OnItemsPropertyChanged));
         public ObservableCollection<aVMTabBase> ItemsSourceProperty
         {
@@ -115,6 +119,9 @@ namespace AdConta.AbleTabControl
                 {
                     this.ItemsSourceProperty.Add(item);
                     item.ChangeTabIndex(e.NewStartingIndex);
+
+                    FalloAlCargarUC UC = this.RootTabControl.FindVisualChild<FalloAlCargarUC>(x => (x as FrameworkElement).Name == "FalloAlCargarUC");
+                    Task.Run(() => AddToFalloAlCargarMultiBindingsAsync(item, UC)).Forget().ConfigureAwait(false);
                 }
             }
 
@@ -123,12 +130,15 @@ namespace AdConta.AbleTabControl
                 foreach (VMTabDiario item in e.OldItems)
                 {
                     this.ItemsSourceProperty.RemoveAt(e.OldStartingIndex);
+
+                    FalloAlCargarUC UC = this.RootTabControl.FindVisualChild<FalloAlCargarUC>(x => (x as FrameworkElement).Name == "FalloAlCargarUC");
+                    Task.Run(() => RemoveBindingFromFalloalCargarAsync(item, UC)).Forget().ConfigureAwait(false);
                 }
             }
         }
 
 
-        public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register("SelectedIndexProperty",
+        public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register("SelectedIndex",
             typeof(int), typeof(AbleTabControl),
             new PropertyMetadata(0, OnSelectedIndexPropertyChanged));
         public int SelectedIndex
@@ -163,10 +173,126 @@ namespace AdConta.AbleTabControl
             Grid BTEGrid = control.RootTabControl.FindVisualChild<Grid>(x => (x as Grid).Name == "TabControlGrid");
             RowDefinition rowDef = BTEGrid.RowDefinitions[3];
             TabbedExpanderBindingChanger filler = new TabbedExpanderBindingChanger(newTab as aTabsWithTabExpVM, ref TopTabExp, ref BottomTabExp, ref rowDef);
+            
+            control.RootTabControl.FindVisualChild<CargandoUC>(x => (x as FrameworkElement).Name == "CargandoUC")
+                .SetBinding(UserControl.VisibilityProperty, control.NewCargandoMultiBinding(newTab));
         }
+        
+
+        //public static readonly DependencyProperty InitTaskProperty =
+        //    DependencyProperty.Register("InitTaskProperty", typeof(NotifyTask), typeof(AbleTabControl), new PropertyMetadata(null));
+        //public NotifyTask InitTask
+        //{
+        //    get { return (NotifyTask)GetValue(InitTaskProperty); }
+        //    set { SetValue(InitTaskProperty, value); }
+        //}
         #endregion
 
         #region helpers
+        private void SetVisibilityConverter(MultiBinding binding)
+        {
+            binding.Converter = new Converters.BoolToVisibilityMultiConverter();
+        }
+        private void SetVisibilityConverter(MultiBinding binding, string parameter)
+        {
+            binding.Converter = new Converters.BoolToVisibilityMultiConverter();
+            binding.ConverterParameter = parameter;
+        }
+        private void SetInitializeTaskBinding()
+        {
+            //this.InitTask = new NotifyTask(((App)Application.Current).Initialized, Application.Current, System.Windows.Threading.DispatcherPriority.Loaded);
+            //this.InitTask = new NotifyTask(((App)Application.Current).Initialized);
+
+            MultiBinding falloVisibilityBinding = NewMultiBindingWithOneBindingAsync((App)Application.Current, "Initialized.IsNotCompleted");
+            MultiBinding falloMensajeBinding = NewMultiBindingWithOneBindingAsync((App)Application.Current, "Initialized.ErrorMessage");
+            MultiBinding cargandoVisibilityBinding = NewMultiBindingWithOneBindingAsync((App)Application.Current, "Initialized.IsNotCompleted");
+
+            SetVisibilityConverter(falloVisibilityBinding, "FalseCollapsed");
+            //SetVisibilityConverter(falloMensajeBinding);
+            falloMensajeBinding.Converter = new Converters.NotifyTaskErrorMessagesCollectionsJoinMultiConverter();
+            SetVisibilityConverter(cargandoVisibilityBinding, "FalseCollapsed");
+            falloVisibilityBinding.NotifyOnSourceUpdated = true;
+            falloMensajeBinding.NotifyOnSourceUpdated = true;
+            cargandoVisibilityBinding.NotifyOnSourceUpdated = true;
+
+            var cargandoUC = this.RootTabControl.FindVisualChild<CargandoUC>(x => (x as CargandoUC).Name == "UCCargando");
+            var falloUC = this.RootTabControl.FindVisualChild<FalloAlCargarUC>(x => (x as FalloAlCargarUC).Name == "UCFalloAlCargar");
+
+            cargandoUC.Dispatcher.Invoke(() => cargandoUC.SetBinding(UserControl.VisibilityProperty, cargandoVisibilityBinding));
+            falloUC.Dispatcher.Invoke(() => falloUC.SetBinding(FalloAlCargarUC.VisibilityProperty, falloVisibilityBinding));
+            falloUC.Dispatcher.Invoke(() => falloUC.SetBinding(FalloAlCargarUC.MensajeFalloProperty, falloMensajeBinding));
+            //this.RootTabControl.FindVisualChild<CargandoUC>(x => (x as FrameworkElement).Name == "CargandoUC")
+            //    .SetBinding(UserControl.VisibilityProperty, cargandoVisibilityBinding);
+            //this.RootTabControl.FindVisualChild<FalloAlCargarUC>(x => (x as FrameworkElement).Name == "FalloAlCargarUC")
+            //    .SetBinding(FalloAlCargarUC.VisibilityProperty, falloVisibilityBinding);
+            //this.RootTabControl.FindVisualChild<FalloAlCargarUC>(x => (x as FrameworkElement).Name == "FalloAlCargarUC")
+            //    .SetBinding(FalloAlCargarUC.MensajeFalloProperty, falloMensajeBinding);
+        }
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        private MultiBinding NewMultiBindingWithOneBindingAsync(object source, string path, BindingMode mode = BindingMode.OneWay)
+        {
+            MultiBinding mBinding = new MultiBinding();
+            mBinding.Bindings.Add(new Binding()
+            {
+                Source = source,
+                Path = new PropertyPath(path),
+                Mode = mode
+            });
+
+            return mBinding;
+        }        
+        protected async Task AddToFalloAlCargarMultiBindingsAsync(aVMTabBase newTab, FalloAlCargarUC UC)
+        {
+            MultiBinding falloMultiBinding = BindingOperations.GetMultiBindingExpression(UC, FalloAlCargarUC.VisibilityProperty).ParentMultiBinding;
+            falloMultiBinding.Bindings.Add(new Binding()
+            {
+                Source = newTab,
+                Path = new PropertyPath("TaskCargando.IsNotCompleted"),
+                Mode = BindingMode.OneWay
+            });
+            SetVisibilityConverter(falloMultiBinding, "FalseCollapsed");
+            falloMultiBinding.NotifyOnSourceUpdated = true;
+            UC.SetBinding(FalloAlCargarUC.VisibilityProperty, falloMultiBinding);
+
+            falloMultiBinding = BindingOperations.GetMultiBindingExpression(UC, FalloAlCargarUC.MensajeFalloProperty).ParentMultiBinding;
+            falloMultiBinding.Bindings.Add(new Binding()
+            {
+                Source = newTab,
+                Path = new PropertyPath("TaskCargando.ErrorMessage"),
+                Mode = BindingMode.OneWay
+            });
+            SetVisibilityConverter(falloMultiBinding);
+            falloMultiBinding.NotifyOnSourceUpdated = true;
+            UC.SetBinding(FalloAlCargarUC.MensajeFalloProperty, falloMultiBinding);
+        }
+        protected async Task RemoveBindingFromFalloalCargarAsync(aVMTabBase removedTab, FalloAlCargarUC UC)
+        {
+            MultiBinding falloMultiBinding = BindingOperations.GetMultiBindingExpression(UC, FalloAlCargarUC.VisibilityProperty).ParentMultiBinding;
+
+            var bindingsToRemove = falloMultiBinding.Bindings.Where(binding => ((Binding)binding).Source == removedTab);
+            foreach (BindingBase binding in bindingsToRemove) falloMultiBinding.Bindings.Remove(binding);
+        }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        protected MultiBinding NewCargandoMultiBinding(aVMTabBase tab)
+        {
+            MultiBinding cargandoBinding = new MultiBinding();
+            cargandoBinding.Bindings.Add(new Binding()
+            {
+                Source = (App)Application.Current,
+                Path = new PropertyPath("Initialized.IsNotCompleted"),
+                Mode = BindingMode.OneWay
+            });
+            cargandoBinding.Bindings.Add(new Binding()
+            {
+                Source = tab,
+                Path = new PropertyPath("TaskCargando.IsNotCompleted"),
+                Mode = BindingMode.OneWay
+            });
+            SetVisibilityConverter(cargandoBinding, "FalseCollapsed");
+            cargandoBinding.NotifyOnSourceUpdated = true;
+
+            return cargandoBinding;
+        }
         #endregion
 
         #region events
@@ -174,7 +300,11 @@ namespace AdConta.AbleTabControl
         {
             Button button = sender as Button;
             TabItem tab = button.FindFirstParentOfType<TabItem>();
-            Task.Run(() => (tab.DataContext as aVMTabBase).CleanUnitOfWork()).Forget().ConfigureAwait(false);
+            tab.Dispatcher.InvokeAsync(() => (tab.DataContext as aVMTabBase).CleanUnitOfWorkAsync());
+            //tab.Dispatcher.Invoke(() =>
+            //    {
+            //        Task.Run(() => (tab.DataContext as aVMTabBase).CleanUnitOfWork()).Forget().ConfigureAwait(false);
+            //    });
             this.ItemsSourceProperty.RemoveAt(this.ItemsSourceProperty.IndexOf(tab.DataContext as aVMTabBase));
         }
 

@@ -85,10 +85,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\C#\WpfCustomChromeLib\Libraries\CustomChromeLibrary\CustomChromeLibrary.csproj">
-      <Project>{25990f61-a27b-4edf-a402-b31bf952153f}</Project>
-      <Name>CustomChromeLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Converters\Converters.csproj">
       <Project>{1d039e54-9b3d-4ae3-af95-cd26d759497a}</Project>
       <Name>Converters</Name>
@@ -108,6 +104,14 @@
     <ProjectReference Include="..\Models\Models.csproj">
       <Project>{941a90cb-1636-48bb-9a7b-bc560ea30ba9}</Project>
       <Name>Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ModuloGeneral\ModuloGeneral.csproj">
+      <Project>{21481137-3ade-4e27-9dbd-423d2ae8fde8}</Project>
+      <Name>ModuloGeneral</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ObjModels_General\ObjModels_General.csproj">
+      <Project>{61439b7d-d7e7-4d24-89ad-3c7c44948c28}</Project>
+      <Name>ObjModels_General</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObjModels_Gestion\ObjModels_Gestion.csproj">
       <Project>{6086eaa3-02ee-4e05-a9a9-3362488be42a}</Project>

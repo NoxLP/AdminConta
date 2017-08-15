@@ -27,7 +27,7 @@ namespace Converters
             {
                 case "AS":
                     double dValue = (double)value;
-                    return dValue - 110;
+                    return dValue - 130;
                 case "TABBEDDIARIO":
                     dValue = (double)value;
                     return dValue - 83;

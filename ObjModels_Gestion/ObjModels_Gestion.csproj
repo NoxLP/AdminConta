@@ -74,6 +74,10 @@
       <Project>{941a90cb-1636-48bb-9a7b-bc560ea30ba9}</Project>
       <Name>Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ObjModels_General\ObjModels_General.csproj">
+      <Project>{61439b7d-d7e7-4d24-89ad-3c7c44948c28}</Project>
+      <Name>ObjModels_General</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

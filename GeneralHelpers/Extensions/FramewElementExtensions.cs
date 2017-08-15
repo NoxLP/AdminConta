@@ -116,8 +116,16 @@ namespace Extensions
             {
                 DependencyObject child = VisualTreeHelper.GetChild(rootObject, i);
 
-                if (child != null && child is T && condition(child))
-                    return (T)child;
+                if(child != null)
+                {
+                    if(child is T)
+                    {
+                        if (condition(child))
+                            return (T)child;
+                    }
+                }
+                //if (child != null && child is T && condition(child))
+                //    return (T)child;
 
                 if (VisualTreeHelper.GetChildrenCount(child) != 0)
                 {

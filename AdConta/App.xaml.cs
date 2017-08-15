@@ -20,7 +20,7 @@ namespace AdConta
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application, iAppRepositories
+    public partial class App : Application, IAppRepositories
     {
         public App()
         {
@@ -31,13 +31,6 @@ namespace AdConta
                 DefaultValue = FindResource(typeof(Window))
             });
 
-            //*************************TODO: pide usuario y rellena propiedad
-            this.UsuarioLogueado = new Usuario("yo", 0);
-            //*************************
-            
-            this.ACData = new AutoCodigoData(this.UsuarioLogueado);
-            Task.Run(() => ConfigMappersAsync()).Forget().ConfigureAwait(false);
-            Task.Run(() => InitRepositoriesAsync()).Forget().ConfigureAwait(false);
             //Genera lista de objModels en excel
             //Propietario p = new Propietario(0, 1, "0", "hola", true);
             //NameSpaceObjectsList.NamespaceObjectsList objsList = new NameSpaceObjectsList.NamespaceObjectsList(
@@ -50,12 +43,14 @@ namespace AdConta
         #region properties
         public AutoCodigoData ACData { get; private set; }
         public Usuario UsuarioLogueado { get; private set; }
+        public NotifyTask Initialized { get; private set; }
         #endregion
 
         #region repositories
         #region general
         public PersonaRepository PersonaRepo { get; private set; }
         public ComunidadRepository ComunidadRepo { get; private set; }
+        public EjercicioRepository EjercicioRepo { get; private set; }
         #endregion
 
         #region contabilidad
@@ -68,20 +63,29 @@ namespace AdConta
         public PropietarioRepository PropietarioRepo { get; private set; }
         #endregion
         #endregion
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            FrameworkElement.LanguageProperty.OverrideMetadata(
-                typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(
-                    System.Windows.Markup.XmlLanguage.GetLanguage(
-                    System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
-            base.OnStartup(e);
-        }
-
+        
         #region helpers
+        private void OnLoginWindowClosed(object sender, EventArgs e)
+        {
+            Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            ((Window)sender).Closed -= OnLoginWindowClosed;
+            Init();
+        }
+        private void Init()
+        {
+            this.Initialized = NotifyTask.Create(new Task(async () =>
+            {
+                Task mappersInit = ConfigMappersAsync();
+                this.ACData = new AutoCodigoData(this.UsuarioLogueado);
+                await mappersInit.ConfigureAwait(false);
+                InitRepositoriesAsync();
+            }), 
+            null);
+
+            this.Initialized.Task.Start();
+        }
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private async Task InitRepositoriesAsync()
+        private void InitRepositoriesAsync()
         {
             this.PersonaRepo = new PersonaRepository();
             this.ComunidadRepo = new ComunidadRepository();
@@ -96,8 +100,16 @@ namespace AdConta
         {
             string[] namespaces = new string[] { "ModuloContabilidad.ObjModels", "ModuloGestion.ObjModels", "AdConta.Models"};
             MapperConfig mConfig = new MapperConfig(namespaces);
-            
+
             //Configuracion de todos los mappers:
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            ConfigMappersGeneral(mConfig).Forget().ConfigureAwait(false);
+            ConfigMappersContabilidad(mConfig).Forget().ConfigureAwait(false);
+            ConfigMappersGestion(mConfig).Forget().ConfigureAwait(false);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+        }
+        private async Task ConfigMappersGeneral(MapperConfig mConfig)
+        {
             //Comunidad
             mConfig
                 .AddConstructor<Comunidad>(x => new Comunidad(x.Id, x.CIF, x.Baja, x.Nombre, x.Codigo, this.ACData, true))
@@ -110,7 +122,7 @@ namespace AdConta
                 .AddNestedProperty<Comunidad, Ejercicio>(false, x => x.EjercicioActivo)
                 .EndConfig<Comunidad>();
             mConfig
-                .AddConstructor<ComunidadDLO>(x => new ComunidadDLO(x.Id, x.Codigo, new NIFModel(x.CIF), x.Baja, x.Nombre, x.TipoVia + x.Direccion, 
+                .AddConstructor<ComunidadDLO>(x => new ComunidadDLO(x.Id, x.Codigo, x.CIF, x.Baja, x.Nombre, x.TipoVia + x.Direccion,
                     x.CuentaBancaria, x.CuentaBancaria2, x.CuentaBancaria3, x.NombrePresidente, x.NombreSecretario, x.NombreTesorero, x.FechaPunteo,
                     x.UltimaFechaBanco))
                 .MapOnlyConstructor<ComunidadDLO>()
@@ -118,9 +130,13 @@ namespace AdConta
             //Ejercicio
             mConfig.EndConfig<Ejercicio>();
             mConfig
-                .AddConstructor<EjercicioDLO>(x =>  new EjercicioDLO(x.Id, x.FechaComienzo, x.FechaFinal, x.IdOwnerComunidad, x.Cerrado))
+                .AddConstructor<EjercicioDLO>(x => new EjercicioDLO(x.Id, x.FechaComienzo, x.FechaFinal, x.IdOwnerComunidad, x.Cerrado))
                 .MapOnlyConstructor<EjercicioDLO>()
                 .EndConfig<EjercicioDLO>();
+            mConfig
+                .AddConstructor<EjercicioDLOParaSideTool>(x => new EjercicioDLOParaSideTool(x.Id, x.FechaComienzo, x.FechaFinal, x.Cerrado))
+                .MapOnlyConstructor<EjercicioDLOParaSideTool>()
+                .EndConfig<EjercicioDLOParaSideTool>();
             //Persona
             mConfig
                 .AddConstructor<Persona>(x => new Persona(x.Id, x.NIF, x.Nombre, true))
@@ -146,7 +162,7 @@ namespace AdConta
                 .AddNestedProperty<GrupoGastos>(false, "_Cuentas")
                 .EndConfig<GrupoGastos>();
             mConfig
-                .AddConstructor<GrupoGastosDLO>(x => new GrupoGastosDLO(x.Id, x.IdOwnerComunidad, x.IdPresupuesto, x.Nombre, 
+                .AddConstructor<GrupoGastosDLO>(x => new GrupoGastosDLO(x.Id, x.IdOwnerComunidad, x.IdPresupuesto, x.Nombre,
                     x.CoeficientesCustom, x.Importe))
                 .MapOnlyConstructor<GrupoGastosDLO>()
                 .EndConfig<GrupoGastosDLO>();
@@ -165,31 +181,45 @@ namespace AdConta
                 .EndConfig<GrupoGastos.CuentaParaPresupuesto>();
             //Presupuesto
             mConfig
-                .AddConstructor<Presupuesto>(x => 
+                .AddConstructor<Presupuesto>(x =>
                     new Presupuesto(x.Id, x.IdOwnerComunidad, x.IdOwnerEjercicio, x.Codigo, this.ACData, x.Aceptado, (TipoRepartoPresupuesto)x.TipoReparto))
                 .AddNestedProperty<Presupuesto>(true, "_GruposDeGasto")
                 .EndConfig<Presupuesto>();
             mConfig
-                .AddConstructor<PresupuestoDLO>(x => new PresupuestoDLO(x.Id, x.IdOwnerComunidad, x.Titulo, x.Total, x.Aceptado, 
+                .AddConstructor<PresupuestoDLO>(x => new PresupuestoDLO(x.Id, x.IdOwnerComunidad, x.Titulo, x.Total, x.Aceptado,
                     (TipoRepartoPresupuesto)x.TipoReparto, x.Codigo))
                 .MapOnlyConstructor<PresupuestoDLO>()
                 .EndConfig<PresupuestoDLO>();
+        }
+        private async Task ConfigMappersContabilidad(MapperConfig mConfig)
+        {
             //ObservableApuntesList
-            mConfig
-                .AddConstructor<ObservableApuntesList>(x =>
-                {
-                    var store = new MapperStore();
-                    DapperMapper<Apunte> mapper = (DapperMapper<Apunte>)store.GetMapper(typeof(Apunte));
-                    List<Apunte> lista = mapper.Map(x, "Id", false); //Obtiene lista de apuntes con sobrecarga de Map()
+            //mConfig
+            //    .AddConstructor<ObservableApuntesList>(x =>
+            //    {
+            //        var store = new MapperStore();
+            //        DapperMapper<Apunte> mapper = (DapperMapper<Apunte>)store.GetMapper(typeof(Apunte));
+            //        List<Apunte> lista = mapper.Map(x, "Id", false); //Obtiene lista de apuntes con sobrecarga de Map()
 
-                    return new ObservableApuntesList(lista.First().Asiento, lista); //crea objeto a partir de esa lista
-                })
-                .MapOnlyConstructor<ObservableApuntesList>()
-                .EndConfig<ObservableApuntesList>();
+            //        return new ObservableApuntesList(lista.First().Asiento, lista); //crea objeto a partir de esa lista
+            //    })
+            //    .MapOnlyConstructor<ObservableApuntesList>()
+            //    .EndConfig<ObservableApuntesList>();
+
             //Apunte
             mConfig
-                .AddNestedProperty<Apunte>(false, "_Asiento")
+                //.AddNestedProperty<Apunte>(true, "_Asiento")
+                .AddMemberCreator<Apunte>("_Asiento", x =>
+                {
+                    Asiento asiento = AsientoRepo.AsientoMapperGetFromDictionary((int)x.Asiento);
+                    return asiento;
+                })
                 .AddMemberCreator<Apunte>("_DebeHaber", x => (DebitCredit)x.DebeHaber)
+                .AddIgnoreProperty<Apunte, decimal>(x => x.ImporteAlDebe)
+                .AddIgnoreProperty<Apunte, decimal>(x => x.ImporteAlHaber)
+                .AddIgnoreProperty<Apunte, bool>(x => x.IsBeingModifiedFromView)
+                .AddIgnoreProperty<Apunte, bool>(x => x.HasBeenModifiedFromView)
+                .AddIgnoreProperty<Apunte, List<string>>(x => x.DirtyMembers)
                 .AddPrefixes<Apunte>(new string[] { "apu" })
                 .EndConfig<Apunte>();
             mConfig
@@ -199,18 +229,26 @@ namespace AdConta
                 .EndConfig<ApunteDLO>();
             //Asiento
             mConfig
-                .AddConstructor<Asiento>(x => new Asiento(x.Id, x.IdOwnerComunidad, x.IdOwnerEjercicio, x.Codigo, this.ACData, x.FechaValor))
-                .AddNestedProperty<Asiento, ObservableApuntesList>(false, x => x.Apuntes)
+                .AddConstructor<Asiento>(x =>
+                {
+                    var store = new MapperStore();
+                    DapperMapper<Apunte> mapper = (DapperMapper<Apunte>)store.GetMapper(typeof(Apunte));
+                    Apunte[] apuntes = mapper.Map(x, "Id", false); //Obtiene lista de apuntes con sobrecarga de Map()
+
+                    return new Asiento(x.Id, x.IdOwnerComunidad, x.IdOwnerEjercicio, x.Codigo, this.ACData, x.FechaValor, apuntes);
+                })
+                //.AddNestedProperty<Asiento, ObservableApuntesList>(false, x => x.Apuntes)
+                .AddIgnoreProperty<Asiento>("Apuntes")
                 .AddIgnoreProperty<Asiento>("Item")
                 .AddPrefixes<Asiento>(new string[] { "asi" })
                 .EndConfig<Asiento>();
             //Gasto-Pago-GastosPagosBase
             mConfig
-                .AddPrefixes<GastosPagosBase.sImporteCuenta>(new string[] { "acreedora_", "deudora_"})
+                .AddPrefixes<GastosPagosBase.sImporteCuenta>(new string[] { "acreedora_", "deudora_" })
                 .EndConfig<GastosPagosBase.sImporteCuenta>();
             mConfig
                 .AddConstructor<GastosPagosBase>(x => new GastosPagosBase(x.Id, x.IdOwnerComunidad, x.IdProveedor, x.IdOwnerFactura, x.Fecha))
-                .AddMemberCreator<GastosPagosBase>("_CuentasAcreedoras", x=>
+                .AddMemberCreator<GastosPagosBase>("_CuentasAcreedoras", x =>
                 {
                     MapperStore store = new MapperStore();
                     DapperMapper<GastosPagosBase.sImporteCuenta> mapper =
@@ -225,7 +263,7 @@ namespace AdConta
 
                         return result;
                     });
-                    
+
                     return mapper.Map<List<GastosPagosBase.sImporteCuenta>>(distinctAcreedX, "Id", false);
                 })
                 .AddMemberCreator<GastosPagosBase>("_CuentasDeudoras", x =>
@@ -315,7 +353,7 @@ namespace AdConta
                 .AddIgnoreProperty<Factura, decimal>(x => x.TotalImpuestos)
                 .EndConfig<Factura>();
             mConfig
-                .AddConstructor<FacturaDLO>(x => new FacturaDLO(x.Id, x.IdProveedor, x.IdOwnerComunidad, x.NFactura, x.Fecha, x.Concepto, x.Total, 
+                .AddConstructor<FacturaDLO>(x => new FacturaDLO(x.Id, x.IdProveedor, x.IdOwnerComunidad, x.NFactura, x.Fecha, x.Concepto, x.Total,
                     x.Pendiente, (TipoPagoFacturas)x.TipoPago))
                 .MapOnlyConstructor<FacturaDLO>()
                 .EndConfig<FacturaDLO>();
@@ -337,8 +375,8 @@ namespace AdConta
                 .AddMemberCreator<Proveedor, TipoPagoFacturas>(x => x.DefaultTipoPagoFacturas, x => (TipoPagoFacturas)x.DefaultTipoPagoFacturas)
                 .EndConfig<Proveedor>();
             mConfig
-                .AddConstructor<ProveedorDLO>(x => new ProveedorDLO(x.Id, x.Nombre, x.NIF, string.Concat(x.TipoVia, " ", 
-                    x.Direccion), x.CuentaBancaria, x.Telefono, x.Email, x.RazonSocial, x.CuentaContableGasto, x.CuentaContablePago, 
+                .AddConstructor<ProveedorDLO>(x => new ProveedorDLO(x.Id, x.Nombre, x.NIF, string.Concat(x.TipoVia, " ",
+                    x.Direccion), x.CuentaBancaria, x.Telefono, x.Email, x.RazonSocial, x.CuentaContableGasto, x.CuentaContablePago,
                     x.CuentaContableProveedor))
                 .MapOnlyConstructor<ProveedorDLO>()
                 .EndConfig<ProveedorDLO>();
@@ -448,6 +486,9 @@ namespace AdConta
                 })
                 .MapOnlyConstructor<DevolucionesList>()
                 .EndConfig<DevolucionesList>();
+        }
+        private async Task ConfigMappersGestion(MapperConfig mConfig)
+        {
             //Cuota
             mConfig
                 .AddNestedProperty<Cuota, Ejercicio>(false, x => x.Ejercicio)
@@ -464,7 +505,7 @@ namespace AdConta
                 .AddDictionary<Propietario>("_Cuotas", new string[2] { "cuotaId", "Cuota" })
                 .EndConfig<Propietario>();
             mConfig
-                .AddConstructor<PropietarioDLO>(x => new PropietarioDLO(x.Id, x.IdOwnerComunidad, x.Nombre, x.NIF, x.Direccion, x.CuentaBancaria, 
+                .AddConstructor<PropietarioDLO>(x => new PropietarioDLO(x.Id, x.IdOwnerComunidad, x.Nombre, x.NIF, x.Direccion, x.CuentaBancaria,
                     x.Telefono, x.Email))
                 .MapOnlyConstructor<PropietarioDLO>()
                 .EndConfig<PropietarioDLO>();
@@ -485,7 +526,7 @@ namespace AdConta
                 .AddMemberCreator<Finca, sTelefono>(x => x.Telefono2, x => new sTelefono(x.Telefono2, x.TipoTelefono2))
                 .AddMemberCreator<Finca, sTelefono>(x => x.Telefono3, x => new sTelefono(x.Telefono3, x.TipoTelefono3))
                 .AddMemberCreator<Finca, sTelefono>(x => x.Fax, x => new sTelefono(x.Fax, TipoTelefono.Fax))
-                .AddMemberCreator<Finca, int[]>(x=>x.IdAsociadas, x=>
+                .AddMemberCreator<Finca, int[]>(x => x.IdAsociadas, x =>
                 {
                     IEnumerable<dynamic> ex = (IEnumerable<dynamic>)x;
                     return ex
@@ -518,7 +559,7 @@ namespace AdConta
                         .Select(dyn => (int)dyn.IdFincaAsociada)
                         .Distinct()
                         .ToArray();
-                    FincaDLO instance = new FincaDLO(x.Id, x.IdOwnerComunidad, x.Baja, x.Nombre, x.Codigo, x.NombreProp, x.Telefono, x.Email, 
+                    FincaDLO instance = new FincaDLO(x.Id, x.IdOwnerComunidad, x.Baja, x.Nombre, x.Codigo, x.NombreProp, x.Telefono, x.Email,
                         asociadas, x.Notas);
                     return instance;
                 })
@@ -533,10 +574,28 @@ namespace AdConta
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         #endregion
 
-        /*protected override void OnExit(ExitEventArgs e)
+        #region events
+        protected override void OnStartup(StartupEventArgs e)
         {
-            this._AppModelControl.UnsubscribeModelControlEvents();
-            base.OnExit(e);
-        }*/
+            Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(
+                    System.Windows.Markup.XmlLanguage.GetLanguage(
+                    System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
+
+            //*************************TODO: pide usuario y rellena propiedad
+            Login.Login loginWindow = new Login.Login();
+            loginWindow.Closed += OnLoginWindowClosed;
+            loginWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            loginWindow.ShowDialog();
+
+            this.UsuarioLogueado = new Usuario();
+            //*************************
+            Init();
+            base.OnStartup(e);
+        }
+        #endregion
     }
 }

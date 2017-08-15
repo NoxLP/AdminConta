@@ -4,7 +4,9 @@ using System.Windows;
 
 namespace AdConta.ViewModel
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public interface IViewModelBase : INotifyPropertyChanged { }
+
+    public class ViewModelBase : IViewModelBase
     {
         #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
